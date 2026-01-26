@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SlideCode - Accueil</title>
+    <link rel="stylesheet" href="../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="menu-header">
+            <button id="burgerBtn" class="burger-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+
+        <div id="dropdownMenu" class="dropdown-content hidden">
+            <a href="#" onclick="alert('Lancement du tutoriel...')">📚 Tutoriel</a>
+            <a href="#" id="btnAbout">👥 À propos</a>
+        </div>
+
+        <div class="projects-list">
+            <h3>Anciens Projets</h3>
+            <ul>
+                <li class="project-item">Présentation CIR3 <span class="date">Hier</span></li>
+                <li class="project-item">Projet Web <span class="date">Il y a 2j</span></li>
+                <li class="project-item">Demo Client <span class="date">Il y a 5j</span></li>
+            </ul>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="top-bar">
+            <button class="btn-login">Connexion</button>
+        </div>
+
+        <div class="center-stage">
+            <div class="logo-container">
+                <h1 class="app-name">Slide<span class="highlight">Code</span></h1>
+                <p class="tagline">Générez vos slides en quelques cliques</p>
+            </div>
+
+            <button class="btn-create" onclick="createNewProject()">
+                <span class="plus">+</span> Nouveau Projet
+            </button>
+        </div>
+    </main>
+
+    <div id="modalAbout" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>L'Équipe SlideCode</h2>
+            <p>Développé par les étudiants CIR3 :</p>
+            <br>
+            <br>
+            <ul>
+                <li><strong>Oscar NICOLAS</strong> : - Manager de Projet / Dev</li><br>
+                <li><strong>Benoit CHIREZ</strong> : - Responsable Technique</li><br>
+                <li><strong>Rémy AGEZ</strong> : - Dev / Design -</li><br>
+                <li><strong>Romain TOFFANELLI</strong> : - Dev / Design -</li><br>
+                <li><strong>Jules LEVECQ</strong> : - Dev / Support émotionnel -</li><br>
+                <li><strong>Les autres on verra plus tard</strong> : - Caca -</li><br>
+            </ul>
+        </div>
+    </div>
+
+    <script src="../JS/main.js"></script>
+</body>
+</html>
