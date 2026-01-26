@@ -42,40 +42,19 @@ const initialNodes = [
     id: 'slide-1',
     type: 'slide',
     position: { x: 250, y: 0 },
-    data: { label: '' },
-  },
-  {
-    id: 'slide-2',
-    type: 'slide',
-    position: { x: 100, y: 150 },
-    data: { label: '' },
-  },
-  {
-    id: 'slide-3',
-    type: 'slide',
-    position: { x: 400, y: 150 },
-    data: { label: '' },
-  },
-  {
-    id: 'slide-4',
-    type: 'slide',
-    position: { x: 250, y: 300 },
-    data: { label: '' },
-  },
+    data: { label: '0' },
+  }
 ];
 
 // Exemple de connexions (liens) entre les slides
 const initialEdges = [
-  { id: '1', source: 'slide-1', target: 'slide-2' },
-  { id: '2', source: 'slide-1', target: 'slide-3' },
-  { id: '3', source: 'slide-2', target: 'slide-4' },  
-  { id: '4', source: 'slide-3', target: 'slide-4' },
+  { id: '1', source: 'slide-1', target: 'slide-2' }
 ];
 
 function App() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [slideCounter, setSlideCounter] = useState(5);
+  const [slideCounter, setSlideCounter] = useState(2);
 
   // Fonction pour connecter des slides ensemble
   const onConnect = useCallback(
@@ -95,6 +74,14 @@ function App() {
     setNodes((nds) => [...nds, newNode]);
     setSlideCounter((counter) => counter + 1);
   }, [slideCounter, setNodes]);
+
+  // Fonction pour changer le nom d'une slide
+  const nameSlide = useCallback((slideId) => {
+    const selectedNode = nodes.find((node) => node.selected);
+    if (selectedNode) {
+      selectedNode.label="test"
+    }
+  }, [setNodes, setEdges]);
 
   // Fonction pour supprimer une slide
   const deleteSlide = useCallback((slideId) => {
@@ -118,13 +105,13 @@ function App() {
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
       <h1 style={{ position: 'absolute', zIndex: 10, margin: '10px' }}>
-        🎨 Éditeur de Diapositives Non Linéaires
+        Carte des slides
       </h1>
       
       {/* Menu de contrôle */}
       <div style={{
         position: 'absolute',
-        top: '80px',
+        top: '100px',
         left: '10px',
         zIndex: 10,
         background: 'white',
@@ -150,6 +137,25 @@ function App() {
         >
           ➕ Ajouter Slide
         </button>
+        <form>
+          <input>
+          </input>
+          <button
+            onClick={nameSlide}
+            style={{
+              padding: '10px 15px',
+              background: '#ffaa00',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: 'bold',
+            }}
+          >
+            ✎ Renommer Slide
+          </button>
+        </form>
         <button
           onClick={deleteSelectedSlide}
           style={{
@@ -163,7 +169,7 @@ function App() {
             fontWeight: 'bold',
           }}
         >
-          🗑️ Supprimer Sélection
+          🗑️ Supprimer Slide
         </button>
         <small style={{ color: '#666', textAlign: 'center' }}>
           Cliquez sur une slide pour la sélectionner
