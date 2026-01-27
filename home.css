@@ -53,8 +53,9 @@ body {
     box-shadow: 10px 0 30px rgba(0,0,0,0.3);
 }
 
-/* Classe ajoutée par JS pour ouvrir le menu */
-.sidebar.open {
+/* Classe ajoutée par JS OU au survol de la souris */
+.sidebar.open, 
+.sidebar:hover { 
     left: 0;
 }
 
@@ -88,11 +89,11 @@ body {
     transition: 0.4s;
 }
 
-/* Quand le menu est ouvert, la flèche se retourne */
-.sidebar.open .arrow {
+/* Quand le menu est ouvert OU survolé, la flèche se retourne */
+.sidebar.open .arrow, 
+.sidebar:hover .arrow {
     transform: rotate(180deg);
 }
-
 /* CONTENU INTERNE */
 .sidebar-content {
     flex: 1; /* Prend toute la place disponible */
@@ -244,11 +245,9 @@ body {
 /* NOUVEAU : Le Canvas en arrière-plan */
 #bgCanvas {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0; /* Derrière le texte mais devant le body */
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0; /* Important : Derrière le contenu (z-index 1, 2 ou 5) */
     pointer-events: none;
 }
 
@@ -403,4 +402,257 @@ body {
 .slide-thumbnail.active {
     border-color: var(--accent);
     color: var(--text-main);
+}
+
+/* =========================================
+   STYLE DU TABLEAU DE BORD (DASHBOARD)
+   ========================================= */
+
+/* --- LAYOUT GLOBAL --- */
+.dash-sidebar-left {
+    width: 220px;
+    background: var(--bg-panel);
+    border-right: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+    z-index: 10;
+    height: 100vh;
+}
+
+.btn-return {
+    color: var(--text-main);
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 8px;
+    transition: 0.3s;
+    background: rgba(255,255,255,0.02);
+}
+
+.btn-return:hover {
+    background: rgba(255,255,255,0.1);
+    transform: translateX(-5px);
+}
+
+.user-mini-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.user-text {
+    display: flex;
+    flex-direction: column;
+}
+.user-text .username { font-weight: bold; font-size: 0.9rem; }
+.user-text .role { font-size: 0.7rem; color: var(--text-muted); }
+
+/* --- CONTENU CENTRAL --- */
+.dash-content {
+    flex: 1;
+    padding: 40px;
+    overflow-y: auto;
+    z-index: 5;
+    /* CORRECTION ICI : Transparent pour voir le Canvas derrière */
+    background: transparent; 
+    height: 100vh;
+}
+
+.dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 30px;
+    border-bottom: 1px solid var(--accent);
+    padding-bottom: 15px;
+    /* On ajoute un petit fond sombre juste sous le titre pour la lisibilité */
+    background: rgba(15, 23, 42, 0.4);
+    padding: 20px;
+    border-radius: 10px;
+    backdrop-filter: blur(5px);
+}
+
+.project-count {
+    background: var(--accent);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    padding-bottom: 50px;
+}
+
+/* --- CARTE PROJET --- */
+.project-card {
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: 0.3s;
+    position: relative;
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+/* Zone d'aperçu */
+.card-preview {
+    height: 140px;
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    cursor: pointer;
+    position: relative;
+}
+
+.star-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: rgba(255,255,255,0.2);
+    transition: 0.2s;
+    z-index: 10;
+}
+.star-btn:hover { transform: scale(1.2); }
+.star-btn.active { color: #fbbf24; text-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
+
+/* Infos */
+.card-infos {
+    padding: 15px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card-infos h3 {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    color: var(--text-main);
+}
+
+.dates-info {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 10px;
+}
+
+/* Suppression des styles badges (Brouillon/Publié) car supprimés */
+.options-btn {
+    align-self: flex-end;
+    background: none; border: none; 
+    color: #64748b; 
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+.options-btn:hover { color: var(--text-main); }
+
+/* --- SIDEBAR DROITE (FILTRES) --- */
+.dash-sidebar-right {
+    width: 250px;
+    background: rgba(15, 23, 42, 0.95);
+    border-left: 1px solid rgba(255,255,255,0.1);
+    padding: 25px;
+    z-index: 10;
+    height: 100vh;
+}
+
+.filter-group {
+    margin-bottom: 30px;
+}
+
+.filter-group label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    gap: 12px;
+    padding: 14px 16px;
+    background: rgba(15, 23, 42, 0.5);
+    border: 1.5px solid rgba(255,255,255,0.15);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+.toggle-label:hover {
+    background: rgba(15, 23, 42, 0.7);
+    border-color: rgba(255,255,255,0.25);
+}
+.toggle-label input { display: none; }
+.toggle-label input:checked ~ .toggle-switch {
+    background: var(--accent);
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
+    border-color: var(--accent);
+}
+.toggle-label input:checked ~ .toggle-switch::before { 
+    transform: translateX(26px);
+    background: white;
+}
+.toggle-switch {
+    width: 54px; 
+    height: 28px;
+    background: #475569;
+    border: 1px solid #334155;
+    border-radius: 20px;
+    position: relative;
+    transition: all 0.35s cubic-bezier(0.4, 0.0, 0.2, 1);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+.toggle-switch::before {
+    content: '';
+    position: absolute;
+    width: 22px; 
+    height: 22px;
+    background: white;
+    border-radius: 50%;
+    top: 3px; 
+    left: 3px;
+    transition: all 0.35s cubic-bezier(0.4, 0.0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.custom-select {
+    width: 100%;
+    padding: 10px;
+    background: var(--bg-dark);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: var(--text-main);
+    border-radius: 6px;
+    outline: none;
+    cursor: pointer;
 }
