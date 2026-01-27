@@ -7,24 +7,52 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+dist-ssr/
+build/
 *.local
+
+# Vite cache
+.vite/
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-.idea
+!.vscode/tasks.json
+.idea/
 .DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.swp
+*~
 
 # Java/Maven build outputs
 *.class
 target/
 *.jar
 *.war
+*.ear
+
+# Maven
+.mvn/
+mvnw
+mvnw.cmd
+
+# H2 Database (optionnel - décommenter si on ne veut pas versionner la DB)
+# backend/data/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# OS files
+Thumbs.db
+ehthumbs.db
