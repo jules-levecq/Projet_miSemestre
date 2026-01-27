@@ -23,8 +23,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const remember = loginForm.querySelector('input[name="remember"]')?.checked;
             
             try {
-                // Appel API backend pour la connexion
-                const response = await fetch('/api/auth/login', {
+                // Afficher un indicateur de chargement
+                const submitBtn = loginForm.querySelector('.btn-submit');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'Connexion...';
+                submitBtn.disabled = true;
+
+                // Appel API backend pour la connexion (endpoint: /api/auth/login)
+                const response = await fetch('http://localhost:8080/api/auth/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -32,38 +38,48 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({ email, password }),
                 });
                 
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+
                 if (response.ok) {
-                    const data = await response.json();
-                    
-                    // Stocker le token
-                    if (remember) {
-                        localStorage.setItem('authToken', data.token);
-                    } else {
-                        sessionStorage.setItem('authToken', data.token);
-                    }
+                    const message = await response.text();
                     
                     // Stocker les infos utilisateur
-                    localStorage.setItem('user', JSON.stringify(data.user));
+                    const storage = remember ? localStorage : sessionStorage;
+                    storage.setItem('user', JSON.stringify({ 
+                        email, 
+                        name: email.split('@')[0],
+                        isLoggedIn: true 
+                    }));
+                    
+                    showSuccess(loginForm, '✅ ' + message + ' Redirection...');
                     
                     // Rediriger vers la page d'accueil
-                    window.location.href = 'home.html';
+                    setTimeout(() => {
+                        window.location.href = 'home.html';
+                    }, 1500);
                 } else {
-                    const error = await response.json();
-                    showError(loginForm, error.message || 'Email ou mot de passe incorrect');
+                    const errorMessage = await response.text();
+                    showError(loginForm, errorMessage || 'Email ou mot de passe incorrect');
                 }
             } catch (error) {
                 console.error('Erreur de connexion:', error);
                 // Mode démo sans backend
-                if (email && password) {
-                    localStorage.setItem('user', JSON.stringify({ 
-                        email, 
-                        name: email.split('@')[0],
-                        isDemo: true 
-                    }));
-                    window.location.href = 'home.html';
-                } else {
-                    showError(loginForm, 'Erreur de connexion au serveur');
-                }
+                showError(loginForm, '⚠️ Serveur non disponible. Mode démo...');
+                
+                setTimeout(() => {
+                    if (email && password) {
+                        localStorage.setItem('user', JSON.stringify({ 
+                            email, 
+                            name: email.split('@')[0],
+                            isDemo: true 
+                        }));
+                        showSuccess(loginForm, '✅ Connexion en mode démo !');
+                        setTimeout(() => {
+                            window.location.href = 'home.html';
+                        }, 1500);
+                    }
+                }, 1500);
             }
         });
     }
@@ -118,8 +134,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             try {
-                // Appel API backend pour l'inscription
-                const response = await fetch('/api/auth/register', {
+                // Afficher un indicateur de chargement
+                const submitBtn = registerForm.querySelector('.btn-submit');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'Création en cours...';
+                submitBtn.disabled = true;
+
+                // Appel API backend pour l'inscription (endpoint: /api/auth/signup)
+                const response = await fetch('http://localhost:8080/api/auth/signup', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -132,29 +154,45 @@ document.addEventListener('DOMContentLoaded', () => {
                     }),
                 });
                 
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+
                 if (response.ok) {
-                    const data = await response.json();
-                    showSuccess(registerForm, 'Compte créé avec succès ! Redirection...');
+                    const message = await response.text();
+                    
+                    // Stocker les infos utilisateur
+                    localStorage.setItem('user', JSON.stringify({ 
+                        email, 
+                        name: `${firstName} ${lastName}`,
+                        isLoggedIn: true 
+                    }));
+                    
+                    showSuccess(registerForm, '✅ ' + message + ' Redirection vers l\'accueil...');
                     
                     setTimeout(() => {
-                        window.location.href = 'connexion.html';
-                    }, 2000);
+                        window.location.href = 'home.html';
+                    }, 2500);
                 } else {
-                    const error = await response.json();
-                    showError(registerForm, error.message || 'Erreur lors de l\'inscription');
+                    const errorMessage = await response.text();
+                    showError(registerForm, errorMessage || 'Erreur lors de l\'inscription');
                 }
             } catch (error) {
                 console.error('Erreur d\'inscription:', error);
-                // Mode démo sans backend
-                localStorage.setItem('user', JSON.stringify({ 
-                    email, 
-                    name: `${firstName} ${lastName}`,
-                    isDemo: true 
-                }));
-                showSuccess(registerForm, 'Compte créé avec succès ! Redirection...');
+                // Mode démo si le backend n'est pas accessible
+                showError(registerForm, '⚠️ Serveur non disponible. Mode démo activé...');
+                
                 setTimeout(() => {
-                    window.location.href = 'home.html';
-                }, 2000);
+                    localStorage.setItem('user', JSON.stringify({ 
+                        email, 
+                        name: `${firstName} ${lastName}`,
+                        isDemo: true 
+                    }));
+                    showSuccess(registerForm, '✅ Compte créé en mode démo ! Redirection...');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'home.html';
+                    }, 2000);
+                }, 1500);
             }
         });
     }
