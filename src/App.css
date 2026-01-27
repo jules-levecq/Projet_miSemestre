@@ -182,6 +182,33 @@
 }
 
 /* ============================================
+   STYLES POUR LES HANDLES (POINTS DE CONNEXION)
+   Points pour créer les liens entre slides
+   ============================================ */
+
+.react-flow__handle {
+  width: 10px;
+  height: 10px;
+  background-color: #4CAF50;
+  border: 2px solid white;
+  border-radius: 50%;
+  cursor: crosshair;
+}
+
+.react-flow__handle:hover {
+  background-color: #45a049;
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
+}
+
+.react-flow__handle.connectingg {
+  background-color: #ff6b6b;
+}
+
+.react-flow__handle-connecting {
+  background-color: #4CAF50;
+}
+
+/* ============================================
    STYLES ADDITIONNELS DU TEMPLATE (CONSERVÉS)
    ============================================ */
 

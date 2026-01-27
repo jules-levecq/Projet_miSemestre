@@ -7,6 +7,8 @@ import {
   useNodesState,
   useEdgesState,
   addEdge,
+  Handle,
+  Position,
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
@@ -160,9 +162,11 @@ function SlideNode({ data, id }) {
    */
   const renderDisplayMode = () => (
     <div className="slide-node" onDoubleClick={handleDoubleClick}>
+      <Handle type="target" position={Position.Top} />
       <div className="slide-node-text" ref={textDisplayRef} style={{ fontSize: `${fontSize}px` }}>
         {editText || id}
       </div>
+      <Handle type="source" position={Position.Bottom} />
     </div>
   );
 
@@ -232,7 +236,7 @@ function App() {
       id: newId,                                           // Unique ID
       type: 'slide',                                       // Type = our SlideNode component
       position: { x: 250 + (slideCounter * 5), y: slideCounter * 5 },  // Position with offset
-      data: { label: '' },                                 // Empty data
+      data: { title: '', fontSize: 12 },                   // Empty title and default font size
     };
 
     // Add the new slide to the existing list
