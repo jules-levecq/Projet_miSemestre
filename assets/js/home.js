@@ -1,26 +1,24 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("SlideCode est prêt !");
+    console.log("Home JS chargé !");
 
     // ==========================================
     // 1. GESTION DU MENU TIROIR (HOVER)
     // ==========================================
     const sidebar = document.getElementById('sidebar');
-    const toggleHandle = document.getElementById('toggleSidebar');
-
+    
     if (sidebar) {
-        // Quand la souris entre sur la zone du menu (ou la poignée qui en fait partie)
+        // Ouverture souris
         sidebar.addEventListener('mouseenter', () => {
             sidebar.classList.add('open');
         });
-
-        // Quand la souris quitte la zone du menu
+        // Fermeture souris
         sidebar.addEventListener('mouseleave', () => {
             sidebar.classList.remove('open');
         });
     }
 
     // ==========================================
-    // 2. EFFET RADAR (SOURIS)
+    // 2. EFFET RADAR (SOURIS SUR LE FOND)
     // ==========================================
     const body = document.querySelector('body');
     document.addEventListener('mousemove', (e) => {
@@ -31,21 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ==========================================
-    // 3. GESTION DU MENU BURGER (INTERNE)
-    // ==========================================
-    // Note: Si tu utilises le menu tiroir, as-tu encore besoin du burgerBtn ? 
-    // Je le laisse au cas où.
-    const burgerBtn = document.getElementById('burgerBtn');
-    const dropdownMenu = document.getElementById('dropdownMenu');
-
-    if (burgerBtn && dropdownMenu) {
-        burgerBtn.addEventListener('click', () => {
-            dropdownMenu.classList.toggle('hidden');
-        });
-    }
-
-    // ==========================================
-    // 4. GESTION DU NOUVEAU PROJET
+    // 3. GESTION DU NOUVEAU PROJET
     // ==========================================
     window.createNewProject = function() {
         const projectName = prompt("Nom du nouveau projet :", "MonProjet");
@@ -57,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ==========================================
-    // 5. GESTION DE LA MODALE "A PROPOS"
+    // 4. GESTION DE LA MODALE "A PROPOS"
     // ==========================================
     const btnAbout = document.getElementById('btnAbout');
     const modalAbout = document.getElementById('modalAbout');
@@ -83,26 +67,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 6. GESTION DU CURSEUR (TYPEWRITER)
+    // 5. GESTION DU CURSEUR (TYPEWRITER) - 12 SECONDES
     // ==========================================
-    setTimeout(() => {
-        const tagline = document.querySelector('.tagline');
-        if (tagline) {
+    const tagline = document.querySelector('.tagline');
+    if (tagline) {
+        setTimeout(() => {
+            // On enlève la bordure (le curseur clignotant)
             tagline.style.borderRight = 'none';
-            tagline.style.animation = 'none';
-        }
-    }, 14000); // 14 secondes
+        }, 12000); // 12000 ms = 12 secondes
+    }
+
+    // ==========================================
+    // 6. ANIMATION CANVAS (RECTANGLES ET LIGNES)
+    // ==========================================
+    // On lance l'animation ici pour être sûr que le DOM est prêt
+    initCanvasAnimation();
 });
 
-// ==========================================
-// 7. ANIMATION CANVAS (En dehors du DOMContentLoaded)
-// ==========================================
-const canvas = document.getElementById('bgCanvas');
+// Fonction isolée pour l'animation (réutilisable proprement)
+function initCanvasAnimation() {
+    const canvas = document.getElementById('bgCanvas');
+    
+    // Si pas de canvas sur la page, on arrête
+    if (!canvas) return;
 
-if (canvas) {
     const ctx = canvas.getContext('2d');
     let particlesArray;
 
+    // Réglage taille
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
@@ -117,6 +109,7 @@ if (canvas) {
         draw() {
             ctx.beginPath();
             ctx.rect(this.x, this.y, this.size, this.size * 0.6);
+            // Rectangles blancs très légers
             ctx.fillStyle = 'rgba(255, 255, 255, 0.09)';
             ctx.fill();
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
@@ -134,6 +127,7 @@ if (canvas) {
 
     function init() {
         particlesArray = [];
+        // Densité des particules
         let numberOfParticles = (canvas.width * canvas.height) / 22000; 
         for (let i = 0; i < numberOfParticles; i++) {
             particlesArray.push(new Particle());
@@ -143,24 +137,32 @@ if (canvas) {
     function animate() {
         requestAnimationFrame(animate);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+
         for (let i = 0; i < particlesArray.length; i++) {
             particlesArray[i].update();
+
+            // Gestion des connexions (Lignes)
             for (let j = i; j < particlesArray.length; j++) {
                 const dx = particlesArray[i].x - particlesArray[j].x;
                 const dy = particlesArray[i].y - particlesArray[j].y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
+
                 if (distance < 200) {
                     ctx.beginPath();
                     ctx.strokeStyle = 'rgba(255, 255, 255, ' + (1 - distance/200) * 0.4 + ')';
                     ctx.lineWidth = 1;
+                    
                     let p1x = particlesArray[i].x + particlesArray[i].size/2;
                     let p1y = particlesArray[i].y + particlesArray[i].size/4;
                     let p2x = particlesArray[j].x + particlesArray[j].size/2;
                     let p2y = particlesArray[j].y + particlesArray[j].size/4;
+                    
+                    // Courbe de Bézier pour effet organique
                     let midX = (p1x + p2x) / 2;
                     let midY = (p1y + p2y) / 2;
                     let cpX = midX + (p1y - p2y) * 0.2; 
                     let cpY = midY - (p1x - p2x) * 0.2;
+
                     ctx.moveTo(p1x, p1y);
                     ctx.quadraticCurveTo(cpX, cpY, p2x, p2y);
                     ctx.stroke();
@@ -172,6 +174,7 @@ if (canvas) {
     init();
     animate();
 
+    // Redimensionnement
     window.addEventListener('resize', () => {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
