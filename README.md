@@ -18,55 +18,83 @@ Créer un site web pour **créer, éditer et visionner des diapositives non lin�
 - **JPA/Hibernate** - ORM pour la gestion des données
 - **Maven** - Gestionnaire de dépendances Java
 
-## 🚀 Installation
+## 🚀 Lancer le site en local
 
 ### Prérequis
 
-1. **Node.js** (version 18+) : https://nodejs.org/
-   - Vérifier avec : `node --version`
+Avant de commencer, assurez-vous d'avoir installé :
 
-2. **Java JDK** (version 17+) : https://adoptium.net/
-   - Vérifier avec : `java --version`
+| Outil | Version minimale | Vérification | Téléchargement |
+|-------|------------------|--------------|----------------|
+| Node.js | 18+ | `node --version` | https://nodejs.org/ |
+| Java JDK | 17+ | `java --version` | https://adoptium.net/ |
+| Maven | 3.8+ | `mvn --version` | https://maven.apache.org/ |
 
-3. **Maven** (version 3.8+) : https://maven.apache.org/
-   - Vérifier avec : `mvn --version`
-
-### Installation du Frontend
+### Étape 1 : Cloner le projet
 
 ```bash
-# 1. Cloner le projet
 git clone https://github.com/jules-levecq/Projet_miSemestre.git
-
-# 2. Aller dans le dossier
 cd Projet_miSemestre
+```
 
-# 3. Installer les dépendances
+### Étape 2 : Installer les dépendances frontend
+
+```bash
 npm install
+```
 
-# 4. Lancer le serveur de développement
+### Étape 3 : Lancer les serveurs
+
+Vous avez besoin de **2 terminaux** ouverts :
+
+#### Terminal 1 - Backend (API Spring Boot)
+
+```bash
+cd backend
+mvn spring-boot:run
+```
+
+Attendez de voir :
+```
+Started SlidrApplication in X.XXX seconds
+```
+
+#### Terminal 2 - Frontend (React + Vite)
+
+```bash
 npm run dev
 ```
 
-Le frontend sera accessible sur http://localhost:5173 ou http://localhost:5174
+### Étape 4 : Accéder au site
 
-### Installation du Backend
+| Page | URL |
+|------|-----|
+| 🏠 **Page d'accueil** | http://localhost:5173/pages/home.html |
+| 🎨 **Éditeur React** | http://localhost:5173/ |
+| 🔐 **Connexion** | http://localhost:5173/pages/connexion.html |
+| 📝 **Inscription** | http://localhost:5173/pages/inscription.html |
+| 📊 **Dashboard** | http://localhost:5173/pages/dashboard.html |
+| 🗄️ **Console H2** | http://localhost:8080/h2-console |
 
-```bash
-# 1. Aller dans le dossier backend
-cd backend
+### Configuration de la base de données H2
 
-# 2. Compiler et lancer le serveur
-mvn clean install -DskipTests && mvn spring-boot:run
-```
+Pour accéder à la console H2 :
+- **URL** : http://localhost:8080/h2-console
+- **JDBC URL** : `jdbc:h2:file:./data/slidedb`
+- **Username** : `sa`
+- **Password** : *(laisser vide)*
 
-Le backend sera accessible sur http://localhost:8080
+### ⚠️ Dépannage
 
-### Console H2 (Base de données)
+**Le backend ne démarre pas ?**
+- Vérifiez que vous êtes dans le dossier `backend/`
+- Lancez `mvn clean install -DskipTests` avant de relancer
 
-- URL : http://localhost:8080/h2-console
-- JDBC URL : `jdbc:h2:file:./data/slidedb`
-- Username : `sa`
-- Password : *(laisser vide)*
+**Le port 5173 est déjà utilisé ?**
+- Vite utilisera automatiquement le port 5174
+
+**Les styles CSS ne s'affichent pas ?**
+- Videz le cache de votre navigateur (Ctrl+Shift+R)
 
 ## 📁 Structure du projet
 
