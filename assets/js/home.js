@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (projectName) {
             localStorage.setItem('currentProjectName', projectName);
             // Rediriger vers l'éditeur React
-            window.location.href = '/app.html'; 
+            window.location.href = '/index.html'; 
         }
     };
 

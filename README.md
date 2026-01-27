@@ -82,17 +82,18 @@ Projet_miSemestre/
 │   └── data/
 │       └── initialSlides.js          # Données initiales des slides
 │
-├── HTML/                             # Pages HTML statiques
+├── pages/                            # Pages HTML statiques
 │   ├── home.html                     # Page d'accueil
 │   ├── connexion.html                # Page de connexion
 │   └── inscription.html              # Page d'inscription
 │
-├── CSS/
-│   └── auth.css                      # Styles authentification
-│
-├── JS/
-│   ├── auth.js                       # Logique connexion/inscription
-│   └── home.js                       # Logique page d'accueil
+├── assets/                           # Ressources statiques
+│   ├── css/
+│   │   ├── auth.css                  # Styles authentification
+│   │   └── home.css                  # Styles page d'accueil
+│   └── js/
+│       ├── auth.js                   # Logique connexion/inscription
+│       └── home.js                   # Logique page d'accueil
 │
 ├── backend/                          # Backend Spring Boot
 │   ├── src/main/java/com/slidr/
