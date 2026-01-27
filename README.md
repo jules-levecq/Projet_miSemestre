@@ -2,25 +2,39 @@
 
 ## 🎯 But du projet
 
-Créer un site web pour **créer, éditer et visionner des diapositives non linéaires**, où les slides sont reliés de manière flexible (pas seulement en séquence).
+Créer un site web pour **créer, éditer et visionner des diapositives non linéaires**, où les slides sont reliées de manière flexible (pas seulement en séquence). L'éditeur offre une interface style Canva/Figma pour personnaliser chaque slide.
 
 ## 🛠️ Technologies utilisées
 
-- **React** - Framework JavaScript pour l'interface utilisateur
-- **Vite** - Outil de build moderne et rapide
+### Frontend
+- **React 18** - Framework JavaScript pour l'interface utilisateur
+- **Vite 5** - Outil de build moderne et rapide
 - **React Flow (@xyflow/react)** - Bibliothèque pour créer des diagrammes de nœuds interactifs
+- **HTML/CSS/JS** - Pages statiques (accueil, connexion, inscription)
 
-## 🚀 Installation pour les nouveaux membres
+### Backend
+- **Spring Boot 3.2** - Framework Java pour l'API REST
+- **H2 Database** - Base de données embarquée (persistante)
+- **JPA/Hibernate** - ORM pour la gestion des données
+- **Maven** - Gestionnaire de dépendances Java
+
+## 🚀 Installation
 
 ### Prérequis
 
-1. **Installer Node.js** (version 18 ou plus) : https://nodejs.org/
+1. **Node.js** (version 18+) : https://nodejs.org/
    - Vérifier avec : `node --version`
 
-### Étapes d'installation
+2. **Java JDK** (version 17+) : https://adoptium.net/
+   - Vérifier avec : `java --version`
+
+3. **Maven** (version 3.8+) : https://maven.apache.org/
+   - Vérifier avec : `mvn --version`
+
+### Installation du Frontend
 
 ```bash
-# 1. Cloner le projet (si pas encore fait)
+# 1. Cloner le projet
 git clone https://github.com/jules-levecq/Projet_miSemestre.git
 
 # 2. Aller dans le dossier
@@ -33,24 +47,111 @@ npm install
 npm run dev
 ```
 
-Ensuite, ouvrez votre navigateur à l'adresse affichée (généralement http://localhost:5173)
+Le frontend sera accessible sur http://localhost:5173 ou http://localhost:5174
+
+### Installation du Backend
+
+```bash
+# 1. Aller dans le dossier backend
+cd backend
+
+# 2. Compiler et lancer le serveur
+mvn clean install -DskipTests && mvn spring-boot:run
+```
+
+Le backend sera accessible sur http://localhost:8080
+
+### Console H2 (Base de données)
+
+- URL : http://localhost:8080/h2-console
+- JDBC URL : `jdbc:h2:file:./data/slidedb`
+- Username : `sa`
+- Password : *(laisser vide)*
 
 ## 📁 Structure du projet
 
 ```
 Projet_miSemestre/
-├── src/                  # Code source React
-│   ├── App.jsx          # Composant principal avec React Flow
-│   ├── App.css          # Styles du composant
-│   ├── main.jsx         # Point d'entrée React
-│   └── index.css        # Styles globaux
-├── public/              # Fichiers statiques
-├── index.html           # Page HTML principale
-├── package.json         # Dépendances du projet
-└── vite.config.js       # Configuration Vite
+├── src/                              # Code source React
+│   ├── App.jsx                       # Composant principal (gestion des vues)
+│   ├── App.css                       # Styles globaux React
+│   ├── components/
+│   │   ├── FlowEditor/               # Éditeur de graphe (React Flow)
+│   │   ├── SlideEditor/              # Éditeur de slide style Canva
+│   │   └── Toolbar/                  # Barre d'outils
+│   └── data/
+│       └── initialSlides.js          # Données initiales des slides
+│
+├── HTML/                             # Pages HTML statiques
+│   ├── home.html                     # Page d'accueil
+│   ├── connexion.html                # Page de connexion
+│   └── inscription.html              # Page d'inscription
+│
+├── CSS/
+│   └── auth.css                      # Styles authentification
+│
+├── JS/
+│   ├── auth.js                       # Logique connexion/inscription
+│   └── home.js                       # Logique page d'accueil
+│
+├── backend/                          # Backend Spring Boot
+│   ├── src/main/java/com/slidr/
+│   │   ├── SlidrApplication.java     # Point d'entrée Spring
+│   │   ├── controller/
+│   │   │   └── AuthController.java   # API authentification
+│   │   ├── model/
+│   │   │   ├── User.java             # Entité utilisateur
+│   │   │   └── Project.java          # Entité projet
+│   │   └── repository/               # Repositories JPA
+│   ├── src/main/resources/
+│   │   └── application.properties    # Configuration Spring
+│   └── pom.xml                       # Dépendances Maven
+│
+├── index.html                        # Point d'entrée Vite
+├── app.html                          # Alias vers l'éditeur React
+├── package.json                      # Dépendances npm
+└── vite.config.js                    # Configuration Vite
 ```
 
-## 📚 Documentation React Flow
+## ✨ Fonctionnalités
 
-- Site officiel : https://reactflow.dev/
-- Exemples : https://reactflow.dev/examples
+### Éditeur de Graphe (React Flow)
+- Créer des slides interconnectées
+- Glisser-déposer pour réorganiser
+- Connexions flexibles entre slides
+- Double-clic pour éditer une slide
+
+### Éditeur de Slide (Style Canva)
+- 6 templates prédéfinis
+- Ajout de texte, formes, images
+- 10 polices disponibles
+- Redimensionnement avec 8 poignées
+- Palette de couleurs
+- Contrôles de zoom
+
+### Authentification
+- Inscription avec validation
+- Connexion sécurisée
+- Indicateur de force du mot de passe
+- Stockage en base de données H2
+
+### Persistance
+- Sauvegarde automatique dans localStorage (frontend)
+- Base de données H2 pour les utilisateurs (backend)
+
+## 🔗 API Endpoints
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| POST | `/api/auth/signup` | Inscription |
+| POST | `/api/auth/login` | Connexion |
+
+## 📚 Documentation
+
+- React Flow : https://reactflow.dev/
+- Spring Boot : https://spring.io/projects/spring-boot
+- Vite : https://vitejs.dev/
+
+## 👥 Équipe
+
+Projet réalisé dans le cadre du semestre universitaire.

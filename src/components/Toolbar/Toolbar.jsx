@@ -1,9 +1,19 @@
 import './Toolbar.css';
 
 function Toolbar({ onAddSlide, onDeleteSelected, hasSelection }) {
+  // Retour à la page d'accueil
+  const handleBackToHome = () => {
+    window.location.href = '/index.html';
+  };
+
   return (
     <div className="toolbar">
-      <h2 className="toolbar-title">🎨 Diapositives Non Linéaires</h2>
+      <div className="toolbar-left">
+        <button className="toolbar-btn home-btn" onClick={handleBackToHome}>
+          🏠 Accueil
+        </button>
+        <h2 className="toolbar-title">Slid'R</h2>
+      </div>
       
       <div className="toolbar-actions">
         <button className="toolbar-btn add-btn" onClick={onAddSlide}>
