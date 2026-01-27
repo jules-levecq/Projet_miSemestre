@@ -1,0 +1,406 @@
+/* VARIABLES : Pour changer les couleurs facilement */
+:root {
+    --bg-dark: #0f172a;       /* Bleu nuit très sombre */
+    --bg-panel: #1e293b;      /* Bleu un peu plus clair pour les menus */
+    --accent: #3b82f6;        /* Bleu électrique pour les boutons */
+    --text-main: #f8fafc;     /* Blanc cassé */
+    --text-muted: #94a3b8;    /* Gris clair */
+    --grid-line: rgba(255, 255, 255, 0.05);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    overflow: hidden;
+    
+    /* LA GRILLE TECHNIQUE EN FOND (Reste fixe derrière le canvas) */
+    background-image: 
+        radial-gradient(
+            600px circle at var(--x, 50%) var(--y, 50%), 
+            rgba(59, 130, 246, 0.15), 
+            transparent 40%
+        ),
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 100% 100%, 40px 40px, 40px 40px; /* Taille des carreaux */
+    background-attachment: fixed;
+}
+
+/* --- SIDEBAR (TIROIR GLISSANT) --- */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px; /* Caché par défaut (largeur du menu) */
+    width: 280px;
+    height: 100vh;
+    background-color: rgba(30, 41, 59, 0.85); /* Fond semi-transparent */
+    backdrop-filter: blur(10px); /* Effet verre pour voir la grille derrière */
+    border-right: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    flex-direction: column;
+    z-index: 50;
+    transition: left 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); /* Animation fluide */
+    box-shadow: 10px 0 30px rgba(0,0,0,0.3);
+}
+
+/* Classe ajoutée par JS pour ouvrir le menu */
+.sidebar.open {
+    left: 0;
+}
+
+/* LA POIGNÉE (HANDLE) */
+.sidebar-handle {
+    position: absolute;
+    top: 50%;
+    right: -30px; /* On le fait sortir du menu */
+    width: 30px;
+    height: 80px;
+    background-color: var(--accent);
+    border-radius: 0 40px 40px 0; /* Demi-cercle */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transform: translateY(-50%);
+    box-shadow: 4px 0 10px rgba(0,0,0,0.2);
+    transition: 0.3s;
+}
+
+.sidebar-handle:hover {
+    width: 40px; /* S'agrandit un peu au survol */
+    right: -40px;
+}
+
+.arrow {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+    transition: 0.4s;
+}
+
+/* Quand le menu est ouvert, la flèche se retourne */
+.sidebar.open .arrow {
+    transform: rotate(180deg);
+}
+
+/* CONTENU INTERNE */
+.sidebar-content {
+    flex: 1; /* Prend toute la place disponible */
+    padding: 20px;
+    overflow-y: auto; /* Scroll si trop de projets */
+}
+
+.menu-header {
+    margin-bottom: 30px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text-main);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 10px;
+}
+
+.menu-links a {
+    display: block;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 12px 10px;
+    margin-bottom: 5px;
+    border-radius: 6px;
+    transition: 0.2s;
+}
+
+.menu-links a:hover {
+    background: rgba(255,255,255,0.05);
+    color: var(--accent);
+    transform: translateX(5px);
+}
+
+/* FOOTER DU MENU (NOUVEAU) */
+.sidebar-footer {
+    padding: 20px;
+    background: rgba(0,0,0,0.2);
+    border-top: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.avatar {
+    width: 35px; height: 35px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.username { font-size: 0.9rem; font-weight: bold; }
+.status { font-size: 0.7rem; color: var(--text-muted); }
+
+.settings-btn {
+    background: none; border: none;
+    font-size: 1.2rem; cursor: pointer;
+    opacity: 0.6; transition: 0.3s;
+}
+.settings-btn:hover { opacity: 1; transform: rotate(90deg); }
+
+/* Ajustement de la liste des projets existante */
+.projects-list h3 {
+    margin-top: 20px;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* --- MAIN CONTENT (CENTRE) --- */
+.main-content {
+    flex: 1;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.top-bar {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    display: flex;   /* Aligne les boutons côte à côte */
+    gap: 15px;       /* Espace entre les deux boutons */
+    z-index: 10;     /* Au dessus du canvas */
+}
+
+.btn-login {
+    background: transparent;
+    border: 2px solid var(--text-main);
+    color: var(--text-main);
+    padding: 10px 25px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 0.9rem;
+    border-radius: 8px;
+}
+
+.btn-login:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Bouton Inscription */
+.btn-signup {
+    background-color: var(--accent);
+    color: white;
+    border: 2px solid var(--accent);
+    padding: 10px 25px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: 0.3s;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+}
+
+.btn-signup:hover {
+    background-color: #2563eb;
+    border-color: #2563eb;
+    transform: translateY(-2px);
+}
+
+/* MODIFICATION : Center Stage devient transparent pour laisser voir l'animation */
+.center-stage {
+    text-align: center;
+    background: transparent; /* Plus de fond gris */
+    padding: 40px;
+    border: none; /* Plus de bordure */
+    backdrop-filter: none; /* Plus de flou */
+    position: relative;
+    z-index: 2; /* Pour être au-dessus du Canvas */
+}
+
+/* NOUVEAU : Le Canvas en arrière-plan */
+#bgCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0; /* Derrière le texte mais devant le body */
+    pointer-events: none;
+}
+
+.app-name {
+    font-size: 5rem;
+    margin: 0;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.highlight {
+    color: var(--accent);
+}
+
+/* Container du logo et slogan */
+.logo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.typewriter-container {
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.tagline {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    overflow: hidden;
+    border-right: .15em solid var(--accent);
+    white-space: nowrap;
+    margin: 0 auto;
+    letter-spacing: .10em;
+    animation: 
+        typing 3.5s steps(40, end),
+        blink-caret .75s step-end infinite;
+}
+
+@keyframes typing { from { width: 0 } to { width: 100% } }
+@keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: var(--accent) } }
+
+.btn-create {
+    background-color: var(--accent);
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    transition: transform 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-create:hover {
+    transform: scale(1.05);
+    background-color: #2563eb;
+}
+
+.plus {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* --- MODALE --- */
+.modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+.modal.hidden { display: none; }
+
+.modal-content {
+    background: var(--bg-panel);
+    padding: 30px;
+    border-radius: 10px;
+    width: 400px;
+    position: relative;
+    border: 1px solid var(--accent);
+}
+
+.close-modal {
+    position: absolute;
+    top: 10px; right: 15px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* --- STYLE DE L'ÉDITEUR (main.html) --- */
+.editor-header {
+    height: 60px;
+    background: var(--bg-panel);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.editor-container {
+    display: flex;
+    height: calc(100vh - 60px); /* Toute la hauteur moins le header */
+}
+
+.slides-panel, .properties-panel {
+    width: 200px;
+    background: rgba(0,0,0,0.2);
+    border-right: 1px solid rgba(255,255,255,0.1);
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.workspace {
+    flex: 1;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.slide-preview {
+    width: 800px;
+    height: 450px;
+    background: white;
+    color: black;
+    padding: 40px;
+    border-radius: 4px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    overflow: hidden;
+}
+
+.slide-thumbnail {
+    background: var(--bg-dark);
+    padding: 10px;
+    border: 1px solid var(--text-muted);
+    cursor: pointer;
+    color: var(--text-muted);
+}
+
+.slide-thumbnail.active {
+    border-color: var(--accent);
+    color: var(--text-main);
+}
