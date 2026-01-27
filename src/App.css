@@ -1,0 +1,23 @@
+/* Conteneur principal de l'application */
+.app-container {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+
+/* Styles pour les nœuds React Flow */
+.react-flow__node {
+  color: black;
+}
+
+.react-flow__node-default {
+  color: black;
+}
+
+/* Reset des styles par défaut */
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
