@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Slid'R - Inscription</title>
+    <title>Slid'R - Connexion</title>
     <link rel="stylesheet" href="../CSS/auth.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
@@ -16,22 +16,11 @@
         <div class="auth-card">
             <div class="auth-header">
                 <h1 class="logo">Slid<span class="highlight">'R</span></h1>
-                <h2>Inscription</h2>
-                <p>Créez votre compte pour commencer</p>
+                <h2>Connexion</h2>
+                <p>Connectez-vous pour accéder à vos projets</p>
             </div>
             
-            <form id="registerForm" class="auth-form">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="firstName">Prénom</label>
-                        <input type="text" id="firstName" name="firstName" placeholder="Prénom" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="lastName">Nom</label>
-                        <input type="text" id="lastName" name="lastName" placeholder="Nom" required>
-                    </div>
-                </div>
-                
+            <form id="loginForm" class="auth-form">
                 <div class="form-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" placeholder="votre@email.com" required>
@@ -39,25 +28,19 @@
                 
                 <div class="form-group">
                     <label for="password">Mot de passe</label>
-                    <input type="password" id="password" name="password" placeholder="••••••••" required minlength="8">
+                    <input type="password" id="password" name="password" placeholder="••••••••" required>
                     <button type="button" class="toggle-password" onclick="togglePassword('password')">👁️</button>
-                    <div class="password-strength" id="passwordStrength"></div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="confirmPassword">Confirmer le mot de passe</label>
-                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="••••••••" required>
-                    <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword')">👁️</button>
                 </div>
                 
                 <div class="form-options">
                     <label class="checkbox-label">
-                        <input type="checkbox" name="terms" required>
-                        <span>J'accepte les <a href="#">conditions d'utilisation</a></span>
+                        <input type="checkbox" name="remember">
+                        <span>Se souvenir de moi</span>
                     </label>
+                    <a href="#" class="forgot-link">Mot de passe oublié ?</a>
                 </div>
                 
-                <button type="submit" class="btn-submit">Créer mon compte</button>
+                <button type="submit" class="btn-submit">Se connecter</button>
                 
                 <div class="divider">
                     <span>ou</span>
@@ -70,7 +53,7 @@
             </form>
             
             <p class="auth-switch">
-                Déjà un compte ? <a href="connexion.html">Se connecter</a>
+                Pas encore de compte ? <a href="inscription.html">S'inscrire</a>
             </p>
         </div>
     </div>
