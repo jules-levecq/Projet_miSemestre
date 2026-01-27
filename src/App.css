@@ -1,3 +1,7 @@
+/* ============================================
+   STYLES GLOBAUX DU CONTENEUR PRINCIPAL
+   ============================================ */
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -5,15 +9,193 @@
   text-align: center;
 }
 
+/* ============================================
+   CONTENEUR PRINCIPAL DE L'APPLICATION
+   Utilise toute la hauteur et la largeur de l'écran
+   ============================================ */
+
+.app-container {
+  width: 100vw;
+  height: 100vh;
+}
+
+/* ============================================
+   PANNEAU DE CONTRÔLE (MENU LATÉRAL)
+   Contient tous les boutons de contrôle
+   ============================================ */
+
+.control-panel {
+  position: absolute;
+  top: 100px;
+  left: 10px;
+  z-index: 10;
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+  min-width: 180px;
+}
+
+/* ============================================
+   STYLES COMMUNS POUR TOUS LES BOUTONS
+   ============================================ */
+
+.button-common {
+  padding: 10px 15px;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+.button-common:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.button-common:active {
+  transform: translateY(0);
+}
+
+/* ============================================
+   BOUTON POUR AJOUTER UNE SLIDE
+   Couleur verte (#4CAF50)
+   ============================================ */
+
+.button-add {
+  background: #4CAF50;
+}
+
+.button-add:hover {
+  background: #45a049;
+}
+
+/* ============================================
+   TEXTE D'AIDE DANS LE PANNEAU DE CONTRÔLE
+   Affiche des instructions à l'utilisateur
+   ============================================ */
+
+.control-hint {
+  color: #666;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.4;
+  margin-top: 5px;
+}
+
+/* ============================================
+   NŒUD PERSONNALISÉ POUR LES SLIDES
+   Style pour chaque slide dans le diagramme
+   ============================================ */
+
+.slide-node {
+  padding: 15px;
+  border: 2px solid #222;
+  border-radius: 8px;
+  background: #fff;
+  text-align: center;
+  min-width: 70px;
+  min-height: 50px;
+  width: 100px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.slide-node:hover {
+  border-color: #4CAF50;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================
+   NŒUD SÉLECTIONNÉ
+   Style quand la slide est cliquée/sélectionnée
+   ============================================ */
+
+.react-flow__node.selected .slide-node {
+  border-color: #4CAF50;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================
+   CONTENU TEXTE DU NŒUD SLIDE
+   Affiche le titre de la slide
+   ============================================ */
+
+.slide-node-text {
+  font-size: 12px;
+  font-weight: bold;
+  color: black;
+  cursor: pointer;
+  user-select: none;
+  line-height: 1.2;
+  width: 100%;
+  overflow: hidden;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+/* ============================================
+   CHAMP DE TEXTE EN MODE ÉDITION
+   Textarea pour modifier le titre avec plusieurs lignes
+   ============================================ */
+
+.slide-node-input {
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  color: black;
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
+  padding: 3px;
+  outline: none;
+  box-sizing: content-box;
+  font-family: inherit;
+  line-height: 1.2;
+  overflow: hidden;
+  word-wrap: break-word;
+  word-break: break-word;
+  resize: none;
+}
+
+/* ============================================
+   STYLES POUR REACT FLOW
+   Personnalisation des nœuds par défaut
+   ============================================ */
+
+.react-flow__node {
+  color: black;
+}
+
+.react-flow__node-default {
+  color: black;
+}
+
+/* ============================================
+   STYLES ADDITIONNELS DU TEMPLATE (CONSERVÉS)
+   ============================================ */
+
 .logo {
   height: 6em;
   padding: 1.5em;
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
+
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
@@ -39,12 +221,4 @@
 
 .read-the-docs {
   color: #888;
-}
-
-.react-flow__node {
-  color: black;
-}
-
-.react-flow__node-default {
-  color: black;
 }
