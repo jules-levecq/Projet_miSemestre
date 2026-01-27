@@ -51,7 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const projectName = prompt("Nom du nouveau projet :", "MonProjet");
         if (projectName) {
             localStorage.setItem('currentProjectName', projectName);
-            window.location.href = 'main.html'; 
+            // Rediriger vers l'éditeur React
+            window.location.href = '/app.html'; 
         }
     };
 
