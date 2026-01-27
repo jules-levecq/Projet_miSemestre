@@ -292,10 +292,10 @@ function App() {
       }
     };
 
-    // Ajouter l'écouteur d'événement
+    // Add event listener
     window.addEventListener('keydown', handleKeyPress);
 
-    // Nettoyer l'écouteur quand le composant est détruit
+    // Clean up listener when component is destroyed
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [deleteSelectedSlide]);
 
@@ -303,39 +303,39 @@ function App() {
   // CONFIGURATION
   // ============================================
 
-  // Associer les types de nœuds aux composants
-  // Quand React Flow voit type: 'slide', il utilise notre composant SlideNode
+  // Map node types to components
+  // When React Flow sees type: 'slide', it uses our SlideNode component
   const nodeTypes = {
     slide: SlideNode,
   };
 
   // ============================================
-  // RENDU - Affichage de l'interface
+  // RENDER - Interface display
   // ============================================
   return (
     <div className="app-container">
-      {/* Panneau de contrôle avec boutons */}
+      {/* Control panel with buttons */}
       <div className="control-panel">
         <button onClick={addSlide} className="button-common button-add">
-          Ajouter Slide
+          Add Slide
         </button>
         <small className="control-hint">
-          Cliquez sur une slide pour la sélectionner <br></br>
-          Appuyez sur "Suppr" pour supprimer la slide sélectionnée
+          Click on a slide to select it <br></br>
+          Press "Delete" to remove the selected slide
         </small>
       </div>
 
-      {/* Composant React Flow - Le diagramme principal */}
+      {/* React Flow component - The main diagram */}
       <ReactFlow
-        nodes={nodes}              // Les slides à afficher
-        edges={edges}              // Les connexions à afficher
-        onNodesChange={onNodesChange}  // Gestion des changements de nœuds
-        onEdgesChange={onEdgesChange}  // Gestion des changements de connexions
-        onConnect={onConnect}      // Création de nouvelles connexions
-        nodeTypes={nodeTypes}      // Types de nœuds personnalisés
-        fitView                    // Zoomer automatiquement pour tout voir
+        nodes={nodes}              // Slides to display
+        edges={edges}              // Connections to display
+        onNodesChange={onNodesChange}  // Handle node changes
+        onEdgesChange={onEdgesChange}  // Handle connection changes
+        onConnect={onConnect}      // Create new connections
+        nodeTypes={nodeTypes}      // Custom node types
+        fitView                    // Auto-zoom to fit all
       >
-        {/* Fond avec motif */}
+        {/* Patterned background */}
         <Background variant="dots" gap={16} size={1} />
       </ReactFlow>
     </div>
