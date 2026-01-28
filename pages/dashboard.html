@@ -18,12 +18,19 @@
         
         <div class="nav-bottom">
             <div class="user-mini-profile">
-                <div class="avatar">U</div>
+                <div class="avatar" id="userAvatar">?</div>
                 <div class="user-text">
-                    <span class="username">Utilisateur</span>
-                    <span class="role">Connecté</span>
+                    <span class="username" id="userName">Non connecté</span>
+                    <span class="role" id="userStatus">Visiteur</span>
                 </div>
-                <button class="logout-btn" onclick="logout()" title="Déconnexion">🚪</button>
+                <div class="settings-container">
+                    <button class="settings-btn" id="settingsBtn">⚙️</button>
+                    <div class="settings-dropdown" id="settingsDropdown">
+                        <button class="dropdown-item logout-item" onclick="logout()">
+                            🚪 Se déconnecter
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>

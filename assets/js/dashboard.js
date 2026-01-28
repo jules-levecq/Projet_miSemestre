@@ -41,11 +41,37 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Afficher le nom de l'utilisateur
     const user = getCurrentUser();
+    const usernameEl = document.getElementById('userName');
+    const avatarEl = document.getElementById('userAvatar');
+    const statusEl = document.getElementById('userStatus');
+    const settingsBtn = document.getElementById('settingsBtn');
+    const settingsDropdown = document.getElementById('settingsDropdown');
+    
     if (user) {
-        const usernameEl = document.querySelector('.username');
-        const avatarEl = document.querySelector('.avatar');
-        if (usernameEl) usernameEl.textContent = user.firstName || user.name || 'Utilisateur';
+        // Afficher le prénom et le nom complet
+        const fullName = `${user.firstName || ''} ${user.lastName ? user.lastName.charAt(0) + '.' : ''}`.trim();
+        if (usernameEl) usernameEl.textContent = fullName || user.name || 'Utilisateur';
         if (avatarEl) avatarEl.textContent = (user.firstName || user.name || 'U').charAt(0).toUpperCase();
+        if (statusEl) statusEl.textContent = 'Connecté';
+    } else {
+        if (usernameEl) usernameEl.textContent = 'Non connecté';
+        if (avatarEl) avatarEl.textContent = '?';
+        if (statusEl) statusEl.textContent = 'Visiteur';
+    }
+    
+    // Gestion du menu déroulant des paramètres
+    if (settingsBtn && settingsDropdown) {
+        settingsBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            settingsDropdown.classList.toggle('show');
+        });
+        
+        // Fermer le menu si on clique ailleurs
+        document.addEventListener('click', (e) => {
+            if (!settingsDropdown.contains(e.target) && !settingsBtn.contains(e.target)) {
+                settingsDropdown.classList.remove('show');
+            }
+        });
     }
 
     // ==========================================

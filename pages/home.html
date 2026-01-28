@@ -21,20 +21,26 @@
 
             <div class="menu-links">
                 <a href="dashboard.html" id="btnTableau">📊 Tableau de bord</a>
-                <a href="#" id="btnTuto">📚 Tutoriel</a>
                 <a href="#" id="btnAbout">👥 À propos</a>
             </div>
         </div>
 
         <div class="sidebar-footer">
             <div class="user-info">
-                <div class="avatar">O</div>
+                <div class="avatar" id="userAvatar">?</div>
                 <div class="user-details">
-                    <span class="username">Oscar N.</span>
-                    <span class="status">Développeur</span>
+                    <span class="username" id="userName">Non connecté</span>
+                    <span class="status" id="userStatus">Visiteur</span>
                 </div>
             </div>
-            <button class="settings-btn">⚙️</button>
+            <div class="settings-container">
+                <button class="settings-btn" id="settingsBtn">⚙️</button>
+                <div class="settings-dropdown" id="settingsDropdown">
+                    <button class="dropdown-item logout-item" onclick="logout()">
+                        🚪 Se déconnecter
+                    </button>
+                </div>
+            </div>
         </div>
     </aside>
 

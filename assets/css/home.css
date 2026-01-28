@@ -161,12 +161,68 @@ body {
 .username { font-size: 0.9rem; font-weight: bold; }
 .status { font-size: 0.7rem; color: var(--text-muted); }
 
+/* Container du bouton settings et dropdown */
+.settings-container {
+    position: relative;
+}
+
 .settings-btn {
     background: none; border: none;
     font-size: 1.2rem; cursor: pointer;
     opacity: 0.6; transition: 0.3s;
 }
 .settings-btn:hover { opacity: 1; transform: rotate(90deg); }
+
+/* Menu déroulant de déconnexion */
+.settings-dropdown {
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    background: var(--bg-panel);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 8px 0;
+    min-width: 160px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
+    z-index: 100;
+}
+
+.settings-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-5px);
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 15px;
+    background: none;
+    border: none;
+    color: var(--text-main);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: 0.2s;
+    text-align: left;
+}
+
+.dropdown-item:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+.dropdown-item.logout-item {
+    color: #f87171;
+}
+
+.dropdown-item.logout-item:hover {
+    background: rgba(248, 113, 113, 0.1);
+}
 
 .logout-btn {
     background: none; 
@@ -508,6 +564,18 @@ body {
     gap: 12px;
     padding-top: 20px;
     border-top: 1px solid rgba(255,255,255,0.1);
+    position: relative;
+}
+
+.user-mini-profile .settings-container {
+    margin-left: auto;
+}
+
+.user-mini-profile .settings-dropdown {
+    bottom: auto;
+    top: auto;
+    bottom: 100%;
+    right: 0;
 }
 
 .user-text {
