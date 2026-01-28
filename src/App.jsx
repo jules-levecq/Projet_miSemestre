@@ -12,6 +12,15 @@ import {
 } from '@xyflow/react';
 
 import SlideEditor from './components/SlideEditor/SlideEditor';
+import SlideViewer from './components/SlideViewer/SlideViewer';
+import {
+  getCurrentUser,
+  createProject,
+  updateProject,
+  getProject,
+  serializeProject,
+  deserializeProject,
+} from './services/api';
 
 import '@xyflow/react/dist/style.css';
 import './App.css';
@@ -214,6 +223,32 @@ function App() {
   // STATES - Reactive data management
   // ============================================
 
+  // Check if coming from "New Project" button or loading existing project
+  const isNewProject = useRef(false);
+  const projectName = useRef(null);
+  const loadProjectId = useRef(null);
+
+  // Current project info (for saving)
+  const [currentProjectId, setCurrentProjectId] = useState(null);
+  const [currentProjectTitle, setCurrentProjectTitle] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState(''); // 'saved', 'saving', 'error'
+
+  // On first render, check localStorage for new project or project to load
+  useEffect(() => {
+    const storedProjectName = localStorage.getItem('currentProjectName');
+    const storedProjectId = localStorage.getItem('loadProjectId');
+    
+    if (storedProjectName) {
+      isNewProject.current = true;
+      projectName.current = storedProjectName;
+      localStorage.removeItem('currentProjectName');
+    } else if (storedProjectId) {
+      loadProjectId.current = storedProjectId;
+      localStorage.removeItem('loadProjectId');
+    }
+  }, []);
+
   // State of nodes (slides)
   // - nodes: array of current slides
   // - setNodes: function to modify slides
@@ -233,6 +268,121 @@ function App() {
   // State for the slide editor
   // - currentSlide: the slide being edited (null = show flow view)
   const [currentSlide, setCurrentSlide] = useState(null);
+
+  // State for viewer/presentation mode
+  // - isViewing: true when in presentation mode
+  // - viewerStartSlide: the slide to start the presentation from
+  const [isViewing, setIsViewing] = useState(false);
+  const [viewerStartSlide, setViewerStartSlide] = useState(null);
+
+  // ============================================
+  // EFFECT - Load existing project from DB
+  // ============================================
+  useEffect(() => {
+    const loadExistingProject = async () => {
+      if (loadProjectId.current) {
+        try {
+          const project = await getProject(loadProjectId.current);
+          const { nodes: loadedNodes, edges: loadedEdges } = deserializeProject(project.content);
+          
+          setNodes(loadedNodes);
+          setEdges(loadedEdges);
+          setCurrentProjectId(project.id);
+          setCurrentProjectTitle(project.title);
+          
+          // Update slide counter based on loaded nodes
+          const maxId = loadedNodes.reduce((max, node) => {
+            const match = node.id.match(/slide-(\d+)/);
+            return match ? Math.max(max, parseInt(match[1])) : max;
+          }, 0);
+          setSlideCounter(maxId + 1);
+          
+          loadProjectId.current = null;
+        } catch (error) {
+          console.error('Erreur chargement projet:', error);
+        }
+      }
+    };
+    
+    loadExistingProject();
+  }, [setNodes, setEdges]);
+
+  // ============================================
+  // EFFECT - Create first slide for new project & save to DB
+  // ============================================
+  useEffect(() => {
+    const createNewProjectInDB = async () => {
+      if (isNewProject.current && projectName.current) {
+        const user = getCurrentUser();
+        
+        // Create the first slide with the project name
+        const firstSlideId = 'slide-1';
+        const firstSlideData = {
+          label: projectName.current,
+          elements: [],
+          backgroundColor: '#ffffff',
+        };
+
+        const newNodes = [
+          {
+            id: firstSlideId,
+            type: 'slideNode',
+            position: { x: 250, y: 100 },
+            data: firstSlideData,
+          },
+        ];
+
+        // Add the first slide to the nodes
+        setNodes(newNodes);
+        setCurrentProjectTitle(projectName.current);
+
+        // Save to DB if user is logged in
+        if (user && user.id) {
+          try {
+            const content = serializeProject(newNodes, []);
+            const project = await createProject(user.id, projectName.current, content);
+            setCurrentProjectId(project.id);
+            setSaveStatus('saved');
+          } catch (error) {
+            console.error('Erreur création projet:', error);
+            setSaveStatus('error');
+          }
+        }
+
+        // Reset the flag
+        isNewProject.current = false;
+      }
+    };
+    
+    createNewProjectInDB();
+  }, [setNodes]);
+
+  // ============================================
+  // EFFECT - Auto-save project when nodes/edges change
+  // ============================================
+  useEffect(() => {
+    const autoSave = async () => {
+      if (currentProjectId && nodes.length > 0) {
+        setIsSaving(true);
+        setSaveStatus('saving');
+        
+        try {
+          const content = serializeProject(nodes, edges);
+          await updateProject(currentProjectId, currentProjectTitle, content);
+          setSaveStatus('saved');
+        } catch (error) {
+          console.error('Erreur sauvegarde:', error);
+          setSaveStatus('error');
+        } finally {
+          setIsSaving(false);
+        }
+      }
+    };
+
+    // Debounce: save 1 second after last change
+    const timeoutId = setTimeout(autoSave, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [nodes, edges, currentProjectId, currentProjectTitle]);
 
   // ============================================
   // EFFECT - Listen for slide editor events
@@ -256,6 +406,32 @@ function App() {
    */
   const handleBackToFlow = () => {
     setCurrentSlide(null);
+  };
+
+  /**
+   * startPresentation - Start the presentation mode
+   * @param {string} startSlideId - Optional ID of the slide to start from
+   */
+  const startPresentation = useCallback((startSlideId = null) => {
+    if (nodes.length === 0) {
+      alert('Ajoutez au moins une slide pour lancer la présentation.');
+      return;
+    }
+    
+    // If no start slide specified, use the selected slide or the first slide
+    const selectedNode = nodes.find(n => n.selected);
+    const startId = startSlideId || selectedNode?.id || nodes[0]?.id;
+    
+    setViewerStartSlide(startId);
+    setIsViewing(true);
+  }, [nodes]);
+
+  /**
+   * closePresentation - Exit the presentation mode
+   */
+  const closePresentation = () => {
+    setIsViewing(false);
+    setViewerStartSlide(null);
   };
 
   /**
@@ -354,9 +530,10 @@ function App() {
   // ============================================
 
   // Map node types to components
-  // When React Flow sees type: 'slide', it uses our SlideNode component
+  // When React Flow sees type: 'slide' or 'slideNode', it uses our SlideNode component
   const nodeTypes = {
     slide: SlideNode,
+    slideNode: SlideNode,
   };
 
   // ============================================
@@ -366,11 +543,15 @@ function App() {
   /**
    * handleSaveSlide - Saves the slide content from the editor
    * Updates the node data with the new content
+   * @param {string} slideId - ID of the slide being saved
+   * @param {Object} slideData - The new data for the slide
    */
-  const handleSaveSlide = (slideData) => {
+  const handleSaveSlide = (slideId, slideData) => {
+    console.log('App.jsx handleSaveSlide called:', slideId, slideData);
     setNodes((nds) =>
       nds.map((node) => {
-        if (node.id === currentSlide.id) {
+        if (node.id === slideId) {
+          console.log('Updating node:', node.id, 'with:', slideData);
           return {
             ...node,
             data: {
@@ -383,6 +564,18 @@ function App() {
       })
     );
   };
+
+  // If in presentation mode, show the SlideViewer component
+  if (isViewing) {
+    return (
+      <SlideViewer
+        nodes={nodes}
+        edges={edges}
+        startSlideId={viewerStartSlide}
+        onClose={closePresentation}
+      />
+    );
+  }
 
   // If editing a slide, show the SlideEditor component
   if (currentSlide) {
@@ -402,10 +595,36 @@ function App() {
   // Otherwise, show the flow view
   return (
     <div className="app-container">
+      {/* Header with project info and save status */}
+      <div className="project-header">
+        <div className="project-info">
+          <h2 className="project-title">{currentProjectTitle || 'Nouveau Projet'}</h2>
+          <span className={`save-status ${saveStatus}`}>
+            {saveStatus === 'saving' && '⏳ Sauvegarde...'}
+            {saveStatus === 'saved' && '✅ Sauvegardé'}
+            {saveStatus === 'error' && '❌ Erreur de sauvegarde'}
+            {!saveStatus && !currentProjectId && '💾 Non connecté'}
+          </span>
+        </div>
+        <button 
+          onClick={() => window.location.href = '/pages/home.html'} 
+          className="button-common button-back"
+        >
+          ← Retour
+        </button>
+      </div>
+
       {/* Control panel with buttons */}
       <div className="control-panel">
         <button onClick={addSlide} className="button-common button-add">
           Ajouter Slide
+        </button>
+        <button 
+          onClick={() => startPresentation()} 
+          className="button-common button-present"
+          disabled={nodes.length === 0}
+        >
+          ▶ Visionner
         </button>
         <small className="control-hint">
           <strong>Double-clic</strong> = ouvrir l'éditeur<br/>

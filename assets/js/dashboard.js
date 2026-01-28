@@ -2,50 +2,152 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("Dashboard JS chargé !");
 
     // ==========================================
-    // 1. DATA (SIMULATION BDD)
+    // 1. CONFIGURATION API
     // ==========================================
-    let projectsData = [
-        { 
-            id: 1, name: "Présentation Client", 
-            dateCreate: "2023-10-01", lastModified: "2023-10-25", 
-            preview: "📊", isFavorite: true 
-        },
-        { 
-            id: 2, name: "Projet Web CIR3", 
-            dateCreate: "2023-10-20", lastModified: "2023-10-27", 
-            preview: "💻", isFavorite: false 
-        },
-        { 
-            id: 3, name: "Idées Startup", 
-            dateCreate: "2023-09-10", lastModified: "2023-09-15", 
-            preview: "🚀", isFavorite: false 
-        },
-        { 
-            id: 4, name: "Bilan Annuel", 
-            dateCreate: "2023-01-10", lastModified: "2023-10-26", 
-            preview: "📈", isFavorite: true 
-        },
-        { 
-            id: 5, name: "Cours Javascript", 
-            dateCreate: "2023-10-05", lastModified: "2023-10-05", 
-            preview: "JS", isFavorite: false 
+    const API_URL = 'http://localhost:8080/api';
+    
+    // Récupérer l'utilisateur connecté
+    function getCurrentUser() {
+        const userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
+        if (userStr) {
+            try {
+                const user = JSON.parse(userStr);
+                if (user && user.id) {
+                    return user;
+                }
+            } catch {
+                return null;
+            }
         }
-    ];
+        return null;
+    }
+    
+    // Fonction de déconnexion
+    window.logout = function() {
+        localStorage.removeItem('user');
+        sessionStorage.removeItem('user');
+        window.location.href = 'home.html';
+    };
+
+    // ==========================================
+    // 2. DATA
+    // ==========================================
+    let projectsData = [];
 
     const container = document.getElementById('projectsContainer');
     const countValue = document.getElementById('countValue');
     const sortTypeSelect = document.getElementById('sortType');
     const filterFavCheckbox = document.getElementById('filterFav');
+    
+    // Afficher le nom de l'utilisateur
+    const user = getCurrentUser();
+    if (user) {
+        const usernameEl = document.querySelector('.username');
+        const avatarEl = document.querySelector('.avatar');
+        if (usernameEl) usernameEl.textContent = user.firstName || user.name || 'Utilisateur';
+        if (avatarEl) avatarEl.textContent = (user.firstName || user.name || 'U').charAt(0).toUpperCase();
+    }
 
     // ==========================================
-    // 2. RENDU DES PROJETS
+    // 3. CHARGEMENT DES PROJETS DEPUIS L'API
+    // ==========================================
+    async function loadProjects() {
+        const user = getCurrentUser();
+        
+        if (!user || !user.id) {
+            container.innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                    <p style="color: #f87171; font-size: 1.2rem; margin-bottom: 20px;">
+                        ⚠️ Vous devez être connecté pour voir vos projets
+                    </p>
+                    <a href="connexion.html" style="color: var(--accent); text-decoration: underline;">
+                        Se connecter
+                    </a>
+                </div>
+            `;
+            countValue.textContent = '0';
+            return;
+        }
+
+        try {
+            container.innerHTML = '<p style="color:#94a3b8; grid-column: 1/-1; text-align:center;">⏳ Chargement des projets...</p>';
+            
+            const response = await fetch(`${API_URL}/projects/user/${user.id}`);
+            
+            if (!response.ok) {
+                throw new Error('Erreur lors du chargement');
+            }
+            
+            const projects = await response.json();
+            
+            // Transformer les données de l'API au format attendu
+            projectsData = projects.map(p => ({
+                id: p.id,
+                name: p.title,
+                dateCreate: new Date().toISOString().split('T')[0], // TODO: ajouter createdAt dans le backend
+                lastModified: new Date().toISOString().split('T')[0], // TODO: ajouter updatedAt dans le backend
+                preview: getProjectPreview(p.content),
+                isFavorite: false // TODO: ajouter isFavorite dans le backend
+            }));
+            
+            applyFiltersAndSort();
+            
+        } catch (error) {
+            console.error('Erreur chargement projets:', error);
+            container.innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                    <p style="color: #f87171; font-size: 1.2rem; margin-bottom: 10px;">
+                        ❌ Erreur de connexion au serveur
+                    </p>
+                    <p style="color: #94a3b8; font-size: 0.9rem;">
+                        Vérifiez que le backend est lancé sur localhost:8080
+                    </p>
+                </div>
+            `;
+            countValue.textContent = '0';
+        }
+    }
+    
+    // Génère un aperçu basé sur le contenu du projet
+    function getProjectPreview(content) {
+        try {
+            const data = JSON.parse(content);
+            const slideCount = data.nodes ? data.nodes.length : 0;
+            if (slideCount === 0) return '📄';
+            if (slideCount === 1) return '📊';
+            if (slideCount <= 3) return '📑';
+            return '📚';
+        } catch {
+            return '📄';
+        }
+    }
+
+    // ==========================================
+    // 4. RENDU DES PROJETS
     // ==========================================
     function renderProjects(projects) {
         container.innerHTML = '';
         countValue.textContent = projects.length;
 
         if (projects.length === 0) {
-            container.innerHTML = '<p style="color:#94a3b8; grid-column: 1/-1; text-align:center;">Aucun projet trouvé.</p>';
+            container.innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                    <p style="color:#94a3b8; font-size: 1.1rem; margin-bottom: 20px;">
+                        Aucun projet trouvé.
+                    </p>
+                    <button onclick="window.createNewProject()" class="btn-new-project" style="
+                        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                        color: white;
+                        border: none;
+                        padding: 12px 24px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-size: 1rem;
+                    ">
+                        + Créer un projet
+                    </button>
+                </div>
+            `;
             return;
         }
         
@@ -65,7 +167,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span>📅 Créé : ${formatDate(project.dateCreate)}</span>
                         <span style="color:var(--accent)">🕒 Modif : ${formatDate(project.lastModified)}</span>
                     </div>
-                    <div style="text-align: right; margin-top: auto;">
+                    <div style="text-align: right; margin-top: auto; display: flex; gap: 8px; justify-content: flex-end;">
+                        <button class="delete-btn" onclick="deleteProject(event, ${project.id})" title="Supprimer">🗑️</button>
                         <button class="options-btn">⋮</button>
                     </div>
                 </div>
@@ -75,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 3. LOGIQUE FILTRES & TRIS
+    // 5. LOGIQUE FILTRES & TRIS
     // ==========================================
     function applyFiltersAndSort() {
         let filtered = [...projectsData];
@@ -101,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 4. UTILITAIRES
+    // 6. UTILITAIRES
     // ==========================================
     function formatDate(dateString) {
         const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
@@ -118,15 +221,49 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.openProject = function(id) {
-        window.location.href = 'main.html'; 
+        // Stocker l'ID du projet à charger et rediriger vers l'éditeur
+        localStorage.setItem('loadProjectId', id);
+        window.location.href = '/app.html';
+    };
+    
+    window.deleteProject = async function(event, id) {
+        event.stopPropagation();
+        
+        if (!confirm('Êtes-vous sûr de vouloir supprimer ce projet ?')) {
+            return;
+        }
+        
+        try {
+            const response = await fetch(`${API_URL}/projects/${id}`, {
+                method: 'DELETE'
+            });
+            
+            if (response.ok) {
+                // Recharger les projets
+                loadProjects();
+            } else {
+                alert('Erreur lors de la suppression');
+            }
+        } catch (error) {
+            console.error('Erreur suppression:', error);
+            alert('Erreur de connexion au serveur');
+        }
+    };
+    
+    window.createNewProject = function() {
+        const projectName = prompt("Nom du nouveau projet :", "MonProjet");
+        if (projectName) {
+            localStorage.setItem('currentProjectName', projectName);
+            window.location.href = '/app.html';
+        }
     };
 
     // Events
     if (sortTypeSelect) sortTypeSelect.addEventListener('change', applyFiltersAndSort);
     if (filterFavCheckbox) filterFavCheckbox.addEventListener('change', applyFiltersAndSort);
 
-    // Initialisation
-    applyFiltersAndSort();
+    // Initialisation - Charger les projets depuis l'API
+    loadProjects();
 
     // ==========================================
     // 5. LANCEMENT ANIMATION CANVAS (FOND)

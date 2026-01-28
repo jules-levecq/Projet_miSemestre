@@ -168,6 +168,18 @@ body {
 }
 .settings-btn:hover { opacity: 1; transform: rotate(90deg); }
 
+.logout-btn {
+    background: none; 
+    border: none;
+    font-size: 1.2rem; 
+    cursor: pointer;
+    opacity: 0.6; 
+    transition: 0.3s;
+}
+.logout-btn:hover { 
+    opacity: 1; 
+}
+
 /* Ajustement de la liste des projets existante */
 .projects-list h3 {
     margin-top: 20px;
@@ -228,6 +240,56 @@ body {
 .btn-signup:hover {
     background-color: #2563eb;
     border-color: #2563eb;
+    transform: translateY(-2px);
+}
+
+/* Styles pour utilisateur connecté */
+.user-logged {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.welcome-text {
+    color: var(--text-main);
+    font-size: 0.95rem;
+}
+
+.welcome-text strong {
+    color: var(--accent);
+}
+
+.btn-dashboard {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: 0.3s;
+    font-size: 0.9rem;
+}
+
+.btn-dashboard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+}
+
+.btn-logout {
+    background: transparent;
+    border: 2px solid #f87171;
+    color: #f87171;
+    padding: 10px 20px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: 0.3s;
+    font-size: 0.9rem;
+}
+
+.btn-logout:hover {
+    background: rgba(248, 113, 113, 0.1);
     transform: translateY(-2px);
 }
 
@@ -469,7 +531,7 @@ body {
 .dash-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
+    align-items: center;
     margin-bottom: 30px;
     border-bottom: 1px solid var(--accent);
     padding-bottom: 15px;
@@ -480,12 +542,60 @@ body {
     backdrop-filter: blur(5px);
 }
 
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.btn-new-project {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+}
+
+.btn-new-project:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+
+.btn-new-project .plus {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
 .project-count {
     background: var(--accent);
     padding: 5px 12px;
     border-radius: 20px;
     font-size: 0.9rem;
     font-weight: bold;
+}
+
+.delete-btn {
+    background: transparent;
+    border: 1px solid rgba(248, 113, 113, 0.3);
+    color: #f87171;
+    padding: 5px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.delete-btn:hover {
+    background: rgba(248, 113, 113, 0.2);
+    border-color: #f87171;
 }
 
 .projects-grid {

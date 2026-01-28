@@ -21,9 +21,9 @@
                 <div class="avatar">U</div>
                 <div class="user-text">
                     <span class="username">Utilisateur</span>
-                    <span class="role">Admin</span>
+                    <span class="role">Connecté</span>
                 </div>
-                <button class="settings-btn">⚙️</button>
+                <button class="logout-btn" onclick="logout()" title="Déconnexion">🚪</button>
             </div>
         </div>
     </nav>
@@ -34,7 +34,12 @@
                 <h1>Tableau de bord</h1>
                 <p class="subtitle">Retrouvez tous vos travaux ici.</p>
             </div>
-            <div class="project-count"><span id="countValue">0</span> Projets</div>
+            <div class="header-actions">
+                <button onclick="createNewProject()" class="btn-new-project">
+                    <span class="plus">+</span> Nouveau Projet
+                </button>
+                <div class="project-count"><span id="countValue">0</span> Projets</div>
+            </div>
         </header>
 
         <div id="projectsContainer" class="projects-grid"></div>

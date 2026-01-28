@@ -165,15 +165,26 @@ Projet_miSemestre/
 - Stockage en base de données H2
 
 ### Persistance
-- Sauvegarde automatique dans localStorage (frontend)
-- Base de données H2 pour les utilisateurs (backend)
+- Sauvegarde automatique des projets dans la base de données
+- Chargement des projets existants
+- Base de données H2 pour les utilisateurs et projets
 
 ## 🔗 API Endpoints
 
+### Authentification
 | Méthode | Endpoint | Description |
 |---------|----------|-------------|
-| POST | `/api/auth/signup` | Inscription |
-| POST | `/api/auth/login` | Connexion |
+| POST | `/api/auth/signup` | Inscription (retourne userId) |
+| POST | `/api/auth/login` | Connexion (retourne userId) |
+
+### Projets
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| GET | `/api/projects/user/{userId}` | Liste des projets d'un utilisateur |
+| GET | `/api/projects/{id}` | Récupérer un projet |
+| POST | `/api/projects` | Créer un projet |
+| PUT | `/api/projects/{id}` | Mettre à jour un projet |
+| DELETE | `/api/projects/{id}` | Supprimer un projet |
 
 ## 📚 Documentation
 

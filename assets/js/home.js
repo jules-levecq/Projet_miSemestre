@@ -2,6 +2,66 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("Home JS chargé !");
 
     // ==========================================
+    // 0. GESTION DE L'ÉTAT DE CONNEXION
+    // ==========================================
+    function getCurrentUser() {
+        const userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
+        if (userStr) {
+            try {
+                const user = JSON.parse(userStr);
+                if (user && user.id) {
+                    return user;
+                }
+            } catch {
+                return null;
+            }
+        }
+        return null;
+    }
+    
+    function logout() {
+        localStorage.removeItem('user');
+        sessionStorage.removeItem('user');
+        window.location.reload();
+    }
+    
+    // Exposer la fonction de déconnexion globalement
+    window.logout = logout;
+    
+    const user = getCurrentUser();
+    const topBar = document.querySelector('.top-bar');
+    
+    if (topBar) {
+        if (user) {
+            // Utilisateur connecté : afficher son nom et un bouton déconnexion
+            topBar.innerHTML = `
+                <div class="user-logged">
+                    <span class="welcome-text">Bonjour, <strong>${user.firstName || user.name}</strong></span>
+                    <button class="btn-dashboard" onclick="window.location.href='dashboard.html'">📊 Dashboard</button>
+                    <button class="btn-logout" onclick="logout()">Déconnexion</button>
+                </div>
+            `;
+        } else {
+            // Utilisateur non connecté : afficher les boutons connexion/inscription
+            topBar.innerHTML = `
+                <button class="btn-login" onclick="window.location.href='connexion.html'">Connexion</button>
+                <button class="btn-signup" onclick="window.location.href='inscription.html'">Inscription</button>
+            `;
+        }
+    }
+    
+    // Mettre à jour la sidebar avec les infos utilisateur
+    if (user) {
+        const usernameEl = document.querySelector('.username');
+        const avatarEl = document.querySelector('.avatar');
+        const statusEl = document.querySelector('.status');
+        
+        if (usernameEl) usernameEl.textContent = user.firstName || user.name || 'Utilisateur';
+        if (avatarEl) avatarEl.textContent = (user.firstName || user.name || 'U').charAt(0).toUpperCase();
+        if (statusEl) statusEl.textContent = 'Connecté';
+    }
+
+    // ==========================================
     // 1. GESTION DU MENU TIROIR (HOVER)
     // ==========================================
     const sidebar = document.getElementById('sidebar');
@@ -36,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (projectName) {
             localStorage.setItem('currentProjectName', projectName);
             // Rediriger vers l'éditeur React
-            window.location.href = '/index.html'; 
+            window.location.href = '/app.html'; 
         }
     };
 

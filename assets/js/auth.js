@@ -3,6 +3,33 @@
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', () => {
+    
+    // ==========================================
+    // VÉRIFICATION SI DÉJÀ CONNECTÉ
+    // ==========================================
+    function getCurrentUser() {
+        const userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
+        if (userStr) {
+            try {
+                const user = JSON.parse(userStr);
+                // Vérifier que l'utilisateur a un ID valide (pas en mode démo sans ID)
+                if (user && user.id) {
+                    return user;
+                }
+            } catch {
+                return null;
+            }
+        }
+        return null;
+    }
+    
+    const currentUser = getCurrentUser();
+    if (currentUser) {
+        // Utilisateur déjà connecté, rediriger vers la page d'accueil
+        window.location.href = 'home.html';
+        return; // Arrêter l'exécution du reste du script
+    }
+    
     // Effet radar (souris)
     const body = document.querySelector('body');
     document.addEventListener('mousemove', (e) => {
@@ -42,25 +69,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 submitBtn.disabled = false;
 
                 if (response.ok) {
-                    const message = await response.text();
+                    const data = await response.json();
                     
-                    // Stocker les infos utilisateur
+                    // Stocker les infos utilisateur avec l'ID
                     const storage = remember ? localStorage : sessionStorage;
                     storage.setItem('user', JSON.stringify({ 
-                        email, 
-                        name: email.split('@')[0],
+                        id: data.userId,
+                        email: data.email, 
+                        firstName: data.firstName,
+                        lastName: data.lastName,
+                        name: `${data.firstName} ${data.lastName}`,
                         isLoggedIn: true 
                     }));
                     
-                    showSuccess(loginForm, '✅ ' + message + ' Redirection...');
+                    showSuccess(loginForm, '✅ ' + data.message + ' Redirection...');
                     
                     // Rediriger vers la page d'accueil
                     setTimeout(() => {
                         window.location.href = 'home.html';
                     }, 1500);
                 } else {
-                    const errorMessage = await response.text();
-                    showError(loginForm, errorMessage || 'Email ou mot de passe incorrect');
+                    const errorData = await response.json();
+                    showError(loginForm, errorData.error || 'Email ou mot de passe incorrect');
                 }
             } catch (error) {
                 console.error('Erreur de connexion:', error);
@@ -158,23 +188,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 submitBtn.disabled = false;
 
                 if (response.ok) {
-                    const message = await response.text();
+                    const data = await response.json();
                     
-                    // Stocker les infos utilisateur
+                    // Stocker les infos utilisateur avec l'ID
                     localStorage.setItem('user', JSON.stringify({ 
-                        email, 
-                        name: `${firstName} ${lastName}`,
+                        id: data.userId,
+                        email: data.email, 
+                        firstName: data.firstName,
+                        lastName: data.lastName,
+                        name: `${data.firstName} ${data.lastName}`,
                         isLoggedIn: true 
                     }));
                     
-                    showSuccess(registerForm, '✅ ' + message + ' Redirection vers l\'accueil...');
+                    showSuccess(registerForm, '✅ ' + data.message + ' Redirection vers l\'accueil...');
                     
                     setTimeout(() => {
                         window.location.href = 'home.html';
                     }, 2500);
                 } else {
-                    const errorMessage = await response.text();
-                    showError(registerForm, errorMessage || 'Erreur lors de l\'inscription');
+                    const errorData = await response.json();
+                    showError(registerForm, errorData.error || 'Erreur lors de l\'inscription');
                 }
             } catch (error) {
                 console.error('Erreur d\'inscription:', error);

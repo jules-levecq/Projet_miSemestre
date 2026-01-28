@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -17,21 +19,38 @@ public class AuthController {
     private UserRepository userRepository;
 
     @PostMapping("/signup")
-    public ResponseEntity<String> register(@RequestBody User user) {
+    public ResponseEntity<?> register(@RequestBody User user) {
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            return ResponseEntity.badRequest().body("Erreur : Cet email est déjà utilisé !");
+            return ResponseEntity.badRequest().body(Map.of("error", "Cet email est déjà utilisé !"));
         }
-        userRepository.save(user);
-        return ResponseEntity.ok("Inscription réussie pour Slidr !");
+        User saved = userRepository.save(user);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Inscription réussie !");
+        response.put("userId", saved.getId());
+        response.put("firstName", saved.getFirstName());
+        response.put("lastName", saved.getLastName());
+        response.put("email", saved.getEmail());
+        
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody User user) {
+    public ResponseEntity<?> login(@RequestBody User user) {
         Optional<User> dbUser = userRepository.findByEmail(user.getEmail());
 
         if (dbUser.isPresent() && dbUser.get().getPassword().equals(user.getPassword())) {
-            return ResponseEntity.ok("Connexion réussie !");
+            User foundUser = dbUser.get();
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Connexion réussie !");
+            response.put("userId", foundUser.getId());
+            response.put("firstName", foundUser.getFirstName());
+            response.put("lastName", foundUser.getLastName());
+            response.put("email", foundUser.getEmail());
+            
+            return ResponseEntity.ok(response);
         }
-        return ResponseEntity.status(401).body("Identifiants incorrects.");
+        return ResponseEntity.status(401).body(Map.of("error", "Identifiants incorrects."));
     }
 }
