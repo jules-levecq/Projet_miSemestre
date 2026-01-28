@@ -688,3 +688,23 @@
     display: none;
   }
 }
+/* Style pour le placeholder sur un element contenteditable */
+.text-content:empty::before {
+  content: attr(data-placeholder);
+  color: #aaa;
+  font-style: italic;
+  pointer-events: none; /* Empêche d'interagir avec le texte du placeholder */
+  display: block; /* Nécessaire pour certains navigateurs */
+}
+
+/* Optionnel : cacher le placeholder dès qu'on clique dedans (focus) */
+.text-content:focus:empty::before {
+  content: "";
+}
+
+/* SlideEditor.css */
+.text-content {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box; /* Important pour que le padding ne casse pas la taille */
+}
