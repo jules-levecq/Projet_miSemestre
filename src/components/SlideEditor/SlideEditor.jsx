@@ -99,9 +99,8 @@ const COLORS = [
 ];
 
 function SlideEditor({ slide, onSave, onClose }) {
-  // Les données sont directement dans slide, pas dans slide.data
-  const [elements, setElements] = useState(slide?.elements || []);
-  const [backgroundColor, setBackgroundColor] = useState(slide?.backgroundColor || '#ffffff');
+  const [elements, setElements] = useState(slide?.data?.elements || []);
+  const [backgroundColor, setBackgroundColor] = useState(slide?.data?.backgroundColor || '#ffffff');
   const [selectedElement, setSelectedElement] = useState(null);
   const [activePanel, setActivePanel] = useState('templates'); // templates, elements, text, upload
   const [isDragging, setIsDragging] = useState(false);
@@ -109,7 +108,7 @@ function SlideEditor({ slide, onSave, onClose }) {
   const [resizeHandle, setResizeHandle] = useState(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
-  const [showTemplates, setShowTemplates] = useState(!slide?.elements || slide.elements.length === 0);
+  const [showTemplates, setShowTemplates] = useState(elements.length === 0);
   const [zoom, setZoom] = useState(1);
   
   const canvasRef = useRef(null);
@@ -125,18 +124,12 @@ function SlideEditor({ slide, onSave, onClose }) {
 
   // Sauvegarder
   const handleSave = () => {
-    console.log('Saving slide:', slide.id, { elements, backgroundColor });
     onSave(slide.id, {
+      ...slide.data,
       elements,
       backgroundColor,
-      label: slide?.label || 'Sans titre',
+      title: elements.find(el => el.type === 'text')?.content || 'Sans titre',
     });
-  };
-
-  // Sauvegarder et fermer
-  const handleSaveAndClose = () => {
-    handleSave();
-    onClose();
   };
 
   // Appliquer un template
@@ -158,8 +151,10 @@ function SlideEditor({ slide, onSave, onClose }) {
       y: 100,
       width: 300,
       height: 50,
-      content: 'Double-cliquez pour éditer',
+      content: '',
+      placeholder: 'Double-cliquez pour éditer',
       fontSize: 24,
+      backgroundColor: 'transparent',
       fontFamily: 'Inter, sans-serif',
       fontWeight: 'normal',
       fontStyle: 'normal',
@@ -332,7 +327,7 @@ function SlideEditor({ slide, onSave, onClose }) {
   // Raccourcis clavier
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Delete' || e.key === 'Backspace') {
+      if (e.key === 'Delete') {
         if (selectedElement && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
           e.preventDefault();
           deleteSelected();
@@ -380,32 +375,39 @@ function SlideEditor({ slide, onSave, onClose }) {
 
     switch (element.type) {
       case 'text':
-        return (
+      return (
           <div
             key={element.id}
             className={`canvas-element ${isSelected ? 'selected' : ''}`}
-            style={baseStyle}
+            style={{
+              ...baseStyle,
+              backgroundColor: element.backgroundColor, // S'applique ici
+              borderRadius: element.borderRadius || 0,   // Permet aussi d'arrondir le fond
+              padding: element.padding || 0,            // Gère l'espace interne
+            }}
             onMouseDown={(e) => handleMouseDown(e, element)}
           >
-            <div
-              contentEditable
-              suppressContentEditableWarning
-              className="text-content"
-              style={{
-                fontSize: element.fontSize,
-                fontFamily: element.fontFamily || 'Inter, sans-serif',
-                fontWeight: element.fontWeight,
-                fontStyle: element.fontStyle,
-                color: element.color,
-                textAlign: element.align,
-                width: '100%',
-                height: '100%',
-                outline: 'none',
-              }}
-              onBlur={(e) => updateElement(element.id, { content: e.target.innerText })}
-            >
-              {element.content}
-            </div>
+          <div
+            contentEditable
+            suppressContentEditableWarning
+            className="text-content"
+            data-placeholder="Double-cliquez pour éditer"
+            style={{
+              fontSize: element.fontSize,
+              fontFamily: element.fontFamily || 'Inter, sans-serif',
+              fontWeight: element.fontWeight,
+              fontStyle: element.fontStyle,
+              textDecoration: element.textDecoration, // Ajoutez cette ligne
+              color: element.color,
+              textAlign: element.align,
+              width: '100%',
+              height: '100%',
+              outline: 'none',
+            }}
+            onBlur={(e) => updateElement(element.id, { content: e.target.innerText })}
+          >
+            {element.content}
+          </div>
             {isSelected && renderResizeHandles(element)}
           </div>
         );
@@ -538,7 +540,7 @@ function SlideEditor({ slide, onSave, onClose }) {
       {/* Header */}
       <header className="editor-header-canva">
         <div className="header-left">
-          <button className="back-button" onClick={handleSaveAndClose}>
+          <button className="back-button" onClick={onClose}>
             ← Retour
           </button>
           <span className="slide-name">Slide {slideNumber}</span>
@@ -727,6 +729,12 @@ function SlideEditor({ slide, onSave, onClose }) {
                         className={selectedEl.fontStyle === 'italic' ? 'active' : ''}
                         onClick={() => updateElement(selectedEl.id, { fontStyle: selectedEl.fontStyle === 'italic' ? 'normal' : 'italic' })}
                       >I</button>
+                      <button
+                        className={selectedEl.textDecoration === 'underline' ? 'active' : ''}
+                        onClick={() => updateElement(selectedEl.id, { 
+                          textDecoration: selectedEl.textDecoration === 'underline' ? 'none' : 'underline' 
+                        })}
+                      >U</button>
                     </div>
                   </div>
 
@@ -749,7 +757,7 @@ function SlideEditor({ slide, onSave, onClose }) {
                   </div>
 
                   <div className="property-group">
-                    <label>Couleur</label>
+                    <label>Couleur du texte</label>
                     <div className="color-grid">
                       {COLORS.map(color => (
                         <button
@@ -763,7 +771,39 @@ function SlideEditor({ slide, onSave, onClose }) {
                   </div>
                 </>
               )}
+              <div className="property-group">
+                <label>Couleur du fond</label>
+                <div className="color-grid">
+                  {/* Option "Transparent" */}
+                  <button
+                    className={`color-swatch transparent ${selectedEl.backgroundColor === 'transparent' ? 'active' : ''}`}
+                    onClick={() => updateElement(selectedEl.id, { backgroundColor: 'transparent' })}
+                    title="Transparent"
+                  >
+                    ❌
+                  </button>
+                  {COLORS.map(color => (
+                    <button
+                      key={color}
+                      className={`color-swatch ${selectedEl.backgroundColor === color ? 'active' : ''}`}
+                      style={{ backgroundColor: color }}
+                      onClick={() => updateElement(selectedEl.id, { backgroundColor: color })}
+                    />
+                  ))}
+                </div>
+              </div>
 
+              {/* Optionnel : curseur pour l'arrondi du fond si une couleur est mise */}
+              {selectedEl.backgroundColor !== 'transparent' && (
+                <div className="property-group">
+                  <label>Arrondi fond</label>
+                  <input
+                    type="range" min="0" max="50"
+                    value={selectedEl.borderRadius || 0}
+                    onChange={(e) => updateElement(selectedEl.id, { borderRadius: Number(e.target.value) })}
+                  />
+                </div>
+              )}
               {/* Propriétés forme */}
               {['rectangle', 'circle', 'triangle', 'line', 'arrow'].includes(selectedEl.type) && (
                 <>
