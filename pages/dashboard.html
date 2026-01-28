@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slid'R - Tableau de Bord</title>
+    <link rel="stylesheet" href="../assets/css/home.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <nav class="dash-sidebar-left">
+        <div class="nav-top">
+            <a href="home.html" class="btn-return">
+                <span class="arrow">←</span> Retour
+            </a>
+        </div>
+        
+        <div class="nav-bottom">
+            <div class="user-mini-profile">
+                <div class="avatar">U</div>
+                <div class="user-text">
+                    <span class="username">Utilisateur</span>
+                    <span class="role">Connecté</span>
+                </div>
+                <button class="logout-btn" onclick="logout()" title="Déconnexion">🚪</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="dash-content">
+        <header class="dash-header">
+            <div class="header-text">
+                <h1>Tableau de bord</h1>
+                <p class="subtitle">Retrouvez tous vos travaux ici.</p>
+            </div>
+            <div class="header-actions">
+                <button onclick="createNewProject()" class="btn-new-project">
+                    <span class="plus">+</span> Nouveau Projet
+                </button>
+                <div class="project-count"><span id="countValue">0</span> Projets</div>
+            </div>
+        </header>
+
+        <div id="projectsContainer" class="projects-grid"></div>
+    </main>
+
+    <aside class="dash-sidebar-right">
+        <h3>Filtres & Tris</h3><br>
+        
+        <div class="filter-group">
+            <label class="toggle-label">
+                <span>⭐ Favoris uniquement</span><br><br>
+                <input type="checkbox" id="filterFav">
+                <span class="toggle-switch"></span>
+            </label>
+        </div>
+
+        <div class="filter-group">
+            <label>Trier par :</label>
+            <select id="sortType" class="custom-select">
+                <option value="lastMod_recent">🕒 Modifié (Récent)</option>
+                <option value="lastMod_old">🕒 Modifié (Ancien)</option>
+                <option value="dateCreate_recent">📅 Créé (Récent)</option>
+                <option value="dateCreate_old">📅 Créé (Ancien)</option>
+                <option value="az">🔤 Nom (A-Z)</option>
+                <option value="za">🔤 Nom (Z-A)</option>
+            </select>
+        </div>
+    </aside>
+
+    <canvas id="bgCanvas"></canvas>
+
+    <script src="../assets/js/dashboard.js"></script>
+</body>
+</html>

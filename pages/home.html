@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Slid'R - Accueil</title>
-    <link rel="stylesheet" href="/home.css">
+    <link rel="stylesheet" href="../assets/css/home.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-   <aside class="sidebar" id="sidebar">
+    <aside class="sidebar" id="sidebar">
         <div class="sidebar-handle" id="toggleSidebar">
             <span class="arrow">›</span>
         </div>
@@ -20,6 +20,7 @@
             </div>
 
             <div class="menu-links">
+                <a href="dashboard.html" id="btnTableau">📊 Tableau de bord</a>
                 <a href="#" id="btnTuto">📚 Tutoriel</a>
                 <a href="#" id="btnAbout">👥 À propos</a>
             </div>
@@ -39,8 +40,8 @@
 
     <main class="main-content">
         <div class="top-bar">
-            <button class="btn-login">Connexion</button>
-            <button class="btn-signup">Inscription</button>
+            <button class="btn-login" onclick="window.location.href='connexion.html'">Connexion</button>
+            <button class="btn-signup" onclick="window.location.href='inscription.html'">Inscription</button>
         </div>
 
         <div class="center-stage">
@@ -73,11 +74,13 @@
                 <li><strong>Romain TOFFANELLI</strong> : Dev / Design</li><br>
                 <li><strong>Jules LEVECQ</strong> : Dev / Support émotionnel</li><br>
                 <li><strong>Paul DELPIERRE</strong> : Dev </li><br>
-                <li><strong>à définir</strong> : Dev </li><br>
+                <li><strong>Erwan GRAIRE</strong> : Dev </li><br>
+                <li><strong>Dorian MASSARD</strong> : Dev </li><br>
+                <li><strong>Ines KONLACK NGAFFO</strong> : Dev </li><br>
             </ul>
         </div>
     </div>
     
-    <script src="/JS/home.js"></script>
+    <script src="../assets/js/home.js"></script>
 </body>
 </html>

@@ -1,0 +1,768 @@
+/* VARIABLES : Pour changer les couleurs facilement */
+:root {
+    --bg-dark: #0f172a;       /* Bleu nuit très sombre */
+    --bg-panel: #1e293b;      /* Bleu un peu plus clair pour les menus */
+    --accent: #3b82f6;        /* Bleu électrique pour les boutons */
+    --text-main: #f8fafc;     /* Blanc cassé */
+    --text-muted: #94a3b8;    /* Gris clair */
+    --grid-line: rgba(255, 255, 255, 0.05);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    overflow: hidden;
+    
+    /* LA GRILLE TECHNIQUE EN FOND (Reste fixe derrière le canvas) */
+    background-image: 
+        radial-gradient(
+            600px circle at var(--x, 50%) var(--y, 50%), 
+            rgba(59, 130, 246, 0.15), 
+            transparent 40%
+        ),
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 100% 100%, 40px 40px, 40px 40px; /* Taille des carreaux */
+    background-attachment: fixed;
+}
+
+/* --- SIDEBAR (TIROIR GLISSANT) --- */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px; /* Caché par défaut (largeur du menu) */
+    width: 280px;
+    height: 100vh;
+    background-color: rgba(30, 41, 59, 0.85); /* Fond semi-transparent */
+    backdrop-filter: blur(10px); /* Effet verre pour voir la grille derrière */
+    border-right: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    flex-direction: column;
+    z-index: 50;
+    transition: left 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); /* Animation fluide */
+    box-shadow: 10px 0 30px rgba(0,0,0,0.3);
+}
+
+/* Classe ajoutée par JS OU au survol de la souris */
+.sidebar.open, 
+.sidebar:hover { 
+    left: 0;
+}
+
+/* LA POIGNÉE (HANDLE) */
+.sidebar-handle {
+    position: absolute;
+    top: 50%;
+    right: -30px; /* On le fait sortir du menu */
+    width: 30px;
+    height: 80px;
+    background-color: var(--accent);
+    border-radius: 0 40px 40px 0; /* Demi-cercle */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transform: translateY(-50%);
+    box-shadow: 4px 0 10px rgba(0,0,0,0.2);
+    transition: 0.3s;
+}
+
+.sidebar-handle:hover {
+    width: 40px; /* S'agrandit un peu au survol */
+    right: -40px;
+}
+
+.arrow {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+    transition: 0.4s;
+}
+
+/* Quand le menu est ouvert OU survolé, la flèche se retourne */
+.sidebar.open .arrow, 
+.sidebar:hover .arrow {
+    transform: rotate(180deg);
+}
+/* CONTENU INTERNE */
+.sidebar-content {
+    flex: 1; /* Prend toute la place disponible */
+    padding: 20px;
+    overflow-y: auto; /* Scroll si trop de projets */
+}
+
+.menu-header {
+    margin-bottom: 30px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text-main);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 10px;
+}
+
+.menu-links a {
+    display: block;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 12px 10px;
+    margin-bottom: 5px;
+    border-radius: 6px;
+    transition: 0.2s;
+}
+
+.menu-links a:hover {
+    background: rgba(255,255,255,0.05);
+    color: var(--accent);
+    transform: translateX(5px);
+}
+
+/* FOOTER DU MENU (NOUVEAU) */
+.sidebar-footer {
+    padding: 20px;
+    background: rgba(0,0,0,0.2);
+    border-top: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.avatar {
+    width: 35px; height: 35px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.username { font-size: 0.9rem; font-weight: bold; }
+.status { font-size: 0.7rem; color: var(--text-muted); }
+
+.settings-btn {
+    background: none; border: none;
+    font-size: 1.2rem; cursor: pointer;
+    opacity: 0.6; transition: 0.3s;
+}
+.settings-btn:hover { opacity: 1; transform: rotate(90deg); }
+
+.logout-btn {
+    background: none; 
+    border: none;
+    font-size: 1.2rem; 
+    cursor: pointer;
+    opacity: 0.6; 
+    transition: 0.3s;
+}
+.logout-btn:hover { 
+    opacity: 1; 
+}
+
+/* Ajustement de la liste des projets existante */
+.projects-list h3 {
+    margin-top: 20px;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* --- MAIN CONTENT (CENTRE) --- */
+.main-content {
+    flex: 1;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.top-bar {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    display: flex;   /* Aligne les boutons côte à côte */
+    gap: 15px;       /* Espace entre les deux boutons */
+    z-index: 10;     /* Au dessus du canvas */
+}
+
+.btn-login {
+    background: transparent;
+    border: 2px solid var(--text-main);
+    color: var(--text-main);
+    padding: 10px 25px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 0.9rem;
+    border-radius: 8px;
+}
+
+.btn-login:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Bouton Inscription */
+.btn-signup {
+    background-color: var(--accent);
+    color: white;
+    border: 2px solid var(--accent);
+    padding: 10px 25px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: 0.3s;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+}
+
+.btn-signup:hover {
+    background-color: #2563eb;
+    border-color: #2563eb;
+    transform: translateY(-2px);
+}
+
+/* Styles pour utilisateur connecté */
+.user-logged {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.welcome-text {
+    color: var(--text-main);
+    font-size: 0.95rem;
+}
+
+.welcome-text strong {
+    color: var(--accent);
+}
+
+.btn-dashboard {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: 0.3s;
+    font-size: 0.9rem;
+}
+
+.btn-dashboard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+}
+
+.btn-logout {
+    background: transparent;
+    border: 2px solid #f87171;
+    color: #f87171;
+    padding: 10px 20px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: 0.3s;
+    font-size: 0.9rem;
+}
+
+.btn-logout:hover {
+    background: rgba(248, 113, 113, 0.1);
+    transform: translateY(-2px);
+}
+
+/* MODIFICATION : Center Stage devient transparent pour laisser voir l'animation */
+.center-stage {
+    text-align: center;
+    background: transparent; /* Plus de fond gris */
+    padding: 40px;
+    border: none; /* Plus de bordure */
+    backdrop-filter: none; /* Plus de flou */
+    position: relative;
+    z-index: 2; /* Pour être au-dessus du Canvas */
+}
+
+/* NOUVEAU : Le Canvas en arrière-plan */
+#bgCanvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0; /* Important : Derrière le contenu (z-index 1, 2 ou 5) */
+    pointer-events: none;
+}
+
+.app-name {
+    font-size: 5rem;
+    margin: 0;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.highlight {
+    color: var(--accent);
+}
+
+/* Container du logo et slogan */
+.logo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.typewriter-container {
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.tagline {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    overflow: hidden;
+    border-right: .15em solid var(--accent);
+    white-space: nowrap;
+    margin: 0 auto;
+    letter-spacing: .10em;
+    animation: 
+        typing 3.5s steps(40, end),
+        blink-caret .75s step-end infinite;
+}
+
+@keyframes typing { from { width: 0 } to { width: 100% } }
+@keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: var(--accent) } }
+
+.btn-create {
+    background-color: var(--accent);
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    transition: transform 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-create:hover {
+    transform: scale(1.05);
+    background-color: #2563eb;
+}
+
+.plus {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* --- MODALE --- */
+.modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+.modal.hidden { display: none; }
+
+.modal-content {
+    background: var(--bg-panel);
+    padding: 30px;
+    border-radius: 10px;
+    width: 400px;
+    position: relative;
+    border: 1px solid var(--accent);
+}
+
+.close-modal {
+    position: absolute;
+    top: 10px; right: 15px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* --- STYLE DE L'ÉDITEUR (main.html) --- */
+.editor-header {
+    height: 60px;
+    background: var(--bg-panel);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.editor-container {
+    display: flex;
+    height: calc(100vh - 60px); /* Toute la hauteur moins le header */
+}
+
+.slides-panel, .properties-panel {
+    width: 200px;
+    background: rgba(0,0,0,0.2);
+    border-right: 1px solid rgba(255,255,255,0.1);
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.workspace {
+    flex: 1;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.slide-preview {
+    width: 800px;
+    height: 450px;
+    background: white;
+    color: black;
+    padding: 40px;
+    border-radius: 4px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    overflow: hidden;
+}
+
+.slide-thumbnail {
+    background: var(--bg-dark);
+    padding: 10px;
+    border: 1px solid var(--text-muted);
+    cursor: pointer;
+    color: var(--text-muted);
+}
+
+.slide-thumbnail.active {
+    border-color: var(--accent);
+    color: var(--text-main);
+}
+
+/* =========================================
+   STYLE DU TABLEAU DE BORD (DASHBOARD)
+   ========================================= */
+
+/* --- LAYOUT GLOBAL --- */
+.dash-sidebar-left {
+    width: 220px;
+    background: var(--bg-panel);
+    border-right: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+    z-index: 10;
+    height: 100vh;
+}
+
+.btn-return {
+    color: var(--text-main);
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 8px;
+    transition: 0.3s;
+    background: rgba(255,255,255,0.02);
+}
+
+.btn-return:hover {
+    background: rgba(255,255,255,0.1);
+    transform: translateX(-5px);
+}
+
+.user-mini-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.user-text {
+    display: flex;
+    flex-direction: column;
+}
+.user-text .username { font-weight: bold; font-size: 0.9rem; }
+.user-text .role { font-size: 0.7rem; color: var(--text-muted); }
+
+/* --- CONTENU CENTRAL --- */
+.dash-content {
+    flex: 1;
+    padding: 40px;
+    overflow-y: auto;
+    z-index: 5;
+    /* CORRECTION ICI : Transparent pour voir le Canvas derrière */
+    background: transparent; 
+    height: 100vh;
+}
+
+.dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    border-bottom: 1px solid var(--accent);
+    padding-bottom: 15px;
+    /* On ajoute un petit fond sombre juste sous le titre pour la lisibilité */
+    background: rgba(15, 23, 42, 0.4);
+    padding: 20px;
+    border-radius: 10px;
+    backdrop-filter: blur(5px);
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.btn-new-project {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+}
+
+.btn-new-project:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+
+.btn-new-project .plus {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.project-count {
+    background: var(--accent);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.delete-btn {
+    background: transparent;
+    border: 1px solid rgba(248, 113, 113, 0.3);
+    color: #f87171;
+    padding: 5px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.delete-btn:hover {
+    background: rgba(248, 113, 113, 0.2);
+    border-color: #f87171;
+}
+
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    padding-bottom: 50px;
+}
+
+/* --- CARTE PROJET --- */
+.project-card {
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: 0.3s;
+    position: relative;
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+/* Zone d'aperçu */
+.card-preview {
+    height: 140px;
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    cursor: pointer;
+    position: relative;
+}
+
+.star-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: rgba(255,255,255,0.2);
+    transition: 0.2s;
+    z-index: 10;
+}
+.star-btn:hover { transform: scale(1.2); }
+.star-btn.active { color: #fbbf24; text-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
+
+/* Infos */
+.card-infos {
+    padding: 15px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card-infos h3 {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    color: var(--text-main);
+}
+
+.dates-info {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 10px;
+}
+
+/* Suppression des styles badges (Brouillon/Publié) car supprimés */
+.options-btn {
+    align-self: flex-end;
+    background: none; border: none; 
+    color: #64748b; 
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+.options-btn:hover { color: var(--text-main); }
+
+/* --- SIDEBAR DROITE (FILTRES) --- */
+.dash-sidebar-right {
+    width: 250px;
+    background: rgba(15, 23, 42, 0.95);
+    border-left: 1px solid rgba(255,255,255,0.1);
+    padding: 25px;
+    z-index: 10;
+    height: 100vh;
+}
+
+.filter-group {
+    margin-bottom: 30px;
+}
+
+.filter-group label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    gap: 12px;
+    padding: 14px 16px;
+    background: rgba(15, 23, 42, 0.5);
+    border: 1.5px solid rgba(255,255,255,0.15);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+.toggle-label:hover {
+    background: rgba(15, 23, 42, 0.7);
+    border-color: rgba(255,255,255,0.25);
+}
+.toggle-label input { display: none; }
+.toggle-label input:checked ~ .toggle-switch {
+    background: var(--accent);
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
+    border-color: var(--accent);
+}
+.toggle-label input:checked ~ .toggle-switch::before { 
+    transform: translateX(26px);
+    background: white;
+}
+.toggle-switch {
+    width: 54px; 
+    height: 28px;
+    background: #475569;
+    border: 1px solid #334155;
+    border-radius: 20px;
+    position: relative;
+    transition: all 0.35s cubic-bezier(0.4, 0.0, 0.2, 1);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+.toggle-switch::before {
+    content: '';
+    position: absolute;
+    width: 22px; 
+    height: 22px;
+    background: white;
+    border-radius: 50%;
+    top: 3px; 
+    left: 3px;
+    transition: all 0.35s cubic-bezier(0.4, 0.0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.custom-select {
+    width: 100%;
+    padding: 10px;
+    background: var(--bg-dark);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: var(--text-main);
+    border-radius: 6px;
+    outline: none;
+    cursor: pointer;
+}

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slid'R - Connexion</title>
+    <link rel="stylesheet" href="../assets/css/auth.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <canvas id="bgCanvas"></canvas>
+    
+    <div class="auth-container">
+        <a href="home.html" class="back-link">← Retour à l'accueil</a>
+        
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1 class="logo">Slid<span class="highlight">'R</span></h1>
+                <h2>Connexion</h2>
+                <p>Connectez-vous pour accéder à vos projets</p>
+            </div>
+            
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="votre@email.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" id="password" name="password" placeholder="••••••••" required>
+                    <button type="button" class="toggle-password" onclick="togglePassword('password')">👁️</button>
+                </div>
+                
+                <div class="form-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="remember">
+                        <span>Se souvenir de moi</span>
+                    </label>
+                    <a href="#" class="forgot-link">Mot de passe oublié ?</a>
+                </div>
+                
+                <button type="submit" class="btn-submit">Se connecter</button>
+                
+                <div class="divider">
+                    <span>ou</span>
+                </div>
+                
+                <button type="button" class="btn-social google">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                    Continuer avec Google
+                </button>
+            </form>
+            
+            <p class="auth-switch">
+                Pas encore de compte ? <a href="inscription.html">S'inscrire</a>
+            </p>
+        </div>
+    </div>
+    
+    <script src="../assets/js/auth.js"></script>
+</body>
+</html>

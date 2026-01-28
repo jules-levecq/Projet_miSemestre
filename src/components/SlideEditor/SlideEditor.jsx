@@ -99,8 +99,9 @@ const COLORS = [
 ];
 
 function SlideEditor({ slide, onSave, onClose }) {
-  const [elements, setElements] = useState(slide?.data?.elements || []);
-  const [backgroundColor, setBackgroundColor] = useState(slide?.data?.backgroundColor || '#ffffff');
+  // Les données sont directement dans slide, pas dans slide.data
+  const [elements, setElements] = useState(slide?.elements || []);
+  const [backgroundColor, setBackgroundColor] = useState(slide?.backgroundColor || '#ffffff');
   const [selectedElement, setSelectedElement] = useState(null);
   const [activePanel, setActivePanel] = useState('templates'); // templates, elements, text, upload
   const [isDragging, setIsDragging] = useState(false);
@@ -108,7 +109,7 @@ function SlideEditor({ slide, onSave, onClose }) {
   const [resizeHandle, setResizeHandle] = useState(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
-  const [showTemplates, setShowTemplates] = useState(elements.length === 0);
+  const [showTemplates, setShowTemplates] = useState(!slide?.elements || slide.elements.length === 0);
   const [zoom, setZoom] = useState(1);
   
   const canvasRef = useRef(null);
@@ -124,12 +125,18 @@ function SlideEditor({ slide, onSave, onClose }) {
 
   // Sauvegarder
   const handleSave = () => {
+    console.log('Saving slide:', slide.id, { elements, backgroundColor });
     onSave(slide.id, {
-      ...slide.data,
       elements,
       backgroundColor,
-      title: elements.find(el => el.type === 'text')?.content || 'Sans titre',
+      label: slide?.label || 'Sans titre',
     });
+  };
+
+  // Sauvegarder et fermer
+  const handleSaveAndClose = () => {
+    handleSave();
+    onClose();
   };
 
   // Appliquer un template
@@ -531,7 +538,7 @@ function SlideEditor({ slide, onSave, onClose }) {
       {/* Header */}
       <header className="editor-header-canva">
         <div className="header-left">
-          <button className="back-button" onClick={onClose}>
+          <button className="back-button" onClick={handleSaveAndClose}>
             ← Retour
           </button>
           <span className="slide-name">Slide {slideNumber}</span>
