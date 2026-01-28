@@ -325,7 +325,7 @@ function SlideEditor({ slide, onSave, onClose }) {
   // Raccourcis clavier
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Delete' || e.key === 'Backspace') {
+      if (e.key === 'Delete') {
         if (selectedElement && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
           e.preventDefault();
           deleteSelected();
@@ -380,25 +380,26 @@ function SlideEditor({ slide, onSave, onClose }) {
             style={baseStyle}
             onMouseDown={(e) => handleMouseDown(e, element)}
           >
-            <div
-              contentEditable
-              suppressContentEditableWarning
-              className="text-content"
-              style={{
-                fontSize: element.fontSize,
-                fontFamily: element.fontFamily || 'Inter, sans-serif',
-                fontWeight: element.fontWeight,
-                fontStyle: element.fontStyle,
-                color: element.color,
-                textAlign: element.align,
-                width: '100%',
-                height: '100%',
-                outline: 'none',
-              }}
-              onBlur={(e) => updateElement(element.id, { content: e.target.innerText })}
-            >
-              {element.content}
-            </div>
+          <div
+            contentEditable
+            suppressContentEditableWarning
+            className="text-content"
+            style={{
+              fontSize: element.fontSize,
+              fontFamily: element.fontFamily || 'Inter, sans-serif',
+              fontWeight: element.fontWeight,
+              fontStyle: element.fontStyle,
+              textDecoration: element.textDecoration, // Ajoutez cette ligne
+              color: element.color,
+              textAlign: element.align,
+              width: '100%',
+              height: '100%',
+              outline: 'none',
+            }}
+            onBlur={(e) => updateElement(element.id, { content: e.target.innerText })}
+          >
+            {element.content}
+          </div>
             {isSelected && renderResizeHandles(element)}
           </div>
         );
@@ -720,6 +721,12 @@ function SlideEditor({ slide, onSave, onClose }) {
                         className={selectedEl.fontStyle === 'italic' ? 'active' : ''}
                         onClick={() => updateElement(selectedEl.id, { fontStyle: selectedEl.fontStyle === 'italic' ? 'normal' : 'italic' })}
                       >I</button>
+                      <button
+                        className={selectedEl.textDecoration === 'underline' ? 'active' : ''}
+                        onClick={() => updateElement(selectedEl.id, { 
+                          textDecoration: selectedEl.textDecoration === 'underline' ? 'none' : 'underline' 
+                        })}
+                      >U</button>
                     </div>
                   </div>
 
