@@ -151,8 +151,10 @@ function SlideEditor({ slide, onSave, onClose }) {
       y: 100,
       width: 300,
       height: 50,
-      content: 'Double-cliquez pour éditer',
+      content: '',
+      placeholder: 'Double-cliquez pour éditer',
       fontSize: 24,
+      backgroundColor: 'transparent',
       fontFamily: 'Inter, sans-serif',
       fontWeight: 'normal',
       fontStyle: 'normal',
@@ -373,17 +375,23 @@ function SlideEditor({ slide, onSave, onClose }) {
 
     switch (element.type) {
       case 'text':
-        return (
+      return (
           <div
             key={element.id}
             className={`canvas-element ${isSelected ? 'selected' : ''}`}
-            style={baseStyle}
+            style={{
+              ...baseStyle,
+              backgroundColor: element.backgroundColor, // S'applique ici
+              borderRadius: element.borderRadius || 0,   // Permet aussi d'arrondir le fond
+              padding: element.padding || 0,            // Gère l'espace interne
+            }}
             onMouseDown={(e) => handleMouseDown(e, element)}
           >
           <div
             contentEditable
             suppressContentEditableWarning
             className="text-content"
+            data-placeholder="Double-cliquez pour éditer"
             style={{
               fontSize: element.fontSize,
               fontFamily: element.fontFamily || 'Inter, sans-serif',
@@ -392,6 +400,7 @@ function SlideEditor({ slide, onSave, onClose }) {
               textDecoration: element.textDecoration, // Ajoutez cette ligne
               color: element.color,
               textAlign: element.align,
+              borderRadius: element.borderRadius || 0,
               width: '100%',
               height: '100%',
               outline: 'none',
@@ -633,103 +642,34 @@ function SlideEditor({ slide, onSave, onClose }) {
           {selectedEl ? (
             <div className="properties-panel">
               <h3>Propriétés</h3>
-              
-              {/* Position */}
+
+              {/* 1. POSITION & TAILLE (Commun à tous) */}
               <div className="property-group">
-                <label>Position</label>
+                <label>Dimensions</label>
                 <div className="input-row">
-                  <div className="input-group">
-                    <span>X</span>
-                    <input
-                      type="number"
-                      value={Math.round(selectedEl.x)}
-                      onChange={(e) => updateElement(selectedEl.id, { x: Number(e.target.value) })}
-                    />
-                  </div>
-                  <div className="input-group">
-                    <span>Y</span>
-                    <input
-                      type="number"
-                      value={Math.round(selectedEl.y)}
-                      onChange={(e) => updateElement(selectedEl.id, { y: Number(e.target.value) })}
-                    />
-                  </div>
+                  <div className="input-group"><span>X</span><input type="number" value={Math.round(selectedEl.x)} onChange={(e) => updateElement(selectedEl.id, { x: Number(e.target.value) })} /></div>
+                  <div className="input-group"><span>Y</span><input type="number" value={Math.round(selectedEl.y)} onChange={(e) => updateElement(selectedEl.id, { y: Number(e.target.value) })} /></div>
+                </div>
+                <div className="input-row" style={{ marginTop: '8px' }}>
+                  <div className="input-group"><span>L</span><input type="number" value={Math.round(selectedEl.width)} onChange={(e) => updateElement(selectedEl.id, { width: Number(e.target.value) })} /></div>
+                  <div className="input-group"><span>H</span><input type="number" value={Math.round(selectedEl.height)} onChange={(e) => updateElement(selectedEl.id, { height: Number(e.target.value) })} /></div>
                 </div>
               </div>
 
-              {/* Taille */}
-              <div className="property-group">
-                <label>Taille</label>
-                <div className="input-row">
-                  <div className="input-group">
-                    <span>L</span>
-                    <input
-                      type="number"
-                      value={Math.round(selectedEl.width)}
-                      onChange={(e) => updateElement(selectedEl.id, { width: Number(e.target.value) })}
-                    />
-                  </div>
-                  <div className="input-group">
-                    <span>H</span>
-                    <input
-                      type="number"
-                      value={Math.round(selectedEl.height)}
-                      onChange={(e) => updateElement(selectedEl.id, { height: Number(e.target.value) })}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Propriétés texte */}
+              {/* 2. STYLE DE TEXTE (Uniquement pour le texte) */}
               {selectedEl.type === 'text' && (
                 <>
                   <div className="property-group">
-                    <label>Police</label>
-                    <select
-                      className="font-select"
-                      value={selectedEl.fontFamily || 'Inter, sans-serif'}
-                      onChange={(e) => updateElement(selectedEl.id, { fontFamily: e.target.value })}
-                    >
-                      {FONTS.map(font => (
-                        <option key={font.value} value={font.value} style={{ fontFamily: font.value }}>
-                          {font.name}
-                        </option>
-                      ))}
+                    <label>Police & Style</label>
+                    <select className="font-select" value={selectedEl.fontFamily || 'Inter, sans-serif'} onChange={(e) => updateElement(selectedEl.id, { fontFamily: e.target.value })}>
+                      {FONTS.map(font => <option key={font.value} value={font.value}>{font.name}</option>)}
                     </select>
-                  </div>
-
-                  <div className="property-group">
-                    <label>Taille police</label>
-                    <input
-                      type="range"
-                      min="12"
-                      max="72"
-                      value={selectedEl.fontSize}
-                      onChange={(e) => updateElement(selectedEl.id, { fontSize: Number(e.target.value) })}
-                    />
-                    <span className="range-value">{selectedEl.fontSize}px</span>
-                  </div>
-
-                  <div className="property-group">
-                    <label>Style</label>
-                    <div className="style-buttons">
-                      <button
-                        className={selectedEl.fontWeight === 'bold' ? 'active' : ''}
-                        onClick={() => updateElement(selectedEl.id, { fontWeight: selectedEl.fontWeight === 'bold' ? 'normal' : 'bold' })}
-                      >B</button>
-                      <button
-                        className={selectedEl.fontStyle === 'italic' ? 'active' : ''}
-                        onClick={() => updateElement(selectedEl.id, { fontStyle: selectedEl.fontStyle === 'italic' ? 'normal' : 'italic' })}
-                      >I</button>
-                      <button
-                        className={selectedEl.textDecoration === 'underline' ? 'active' : ''}
-                        onClick={() => updateElement(selectedEl.id, { 
-                          textDecoration: selectedEl.textDecoration === 'underline' ? 'none' : 'underline' 
-                        })}
-                      >U</button>
+                    <div className="style-buttons" style={{ marginTop: '8px' }}>
+                      <button className={selectedEl.fontWeight === 'bold' ? 'active' : ''} onClick={() => updateElement(selectedEl.id, { fontWeight: selectedEl.fontWeight === 'bold' ? 'normal' : 'bold' })}>B</button>
+                      <button className={selectedEl.fontStyle === 'italic' ? 'active' : ''} onClick={() => updateElement(selectedEl.id, { fontStyle: selectedEl.fontStyle === 'italic' ? 'normal' : 'italic' })}>I</button>
+                      <button className={selectedEl.textDecoration === 'underline' ? 'active' : ''} onClick={() => updateElement(selectedEl.id, { textDecoration: selectedEl.textDecoration === 'underline' ? 'none' : 'underline' })}>U</button>
                     </div>
                   </div>
-
                   <div className="property-group">
                     <label>Alignement</label>
                     <div className="style-buttons">
@@ -747,105 +687,62 @@ function SlideEditor({ slide, onSave, onClose }) {
                       >➡</button>
                     </div>
                   </div>
-
                   <div className="property-group">
-                    <label>Couleur</label>
+                    <label>Couleur du texte</label>
                     <div className="color-grid">
                       {COLORS.map(color => (
-                        <button
-                          key={color}
-                          className={`color-swatch ${selectedEl.color === color ? 'active' : ''}`}
-                          style={{ backgroundColor: color }}
-                          onClick={() => updateElement(selectedEl.id, { color })}
-                        />
+                        <button key={color} className={`color-swatch ${selectedEl.color === color ? 'active' : ''}`} style={{ backgroundColor: color }} onClick={() => updateElement(selectedEl.id, { color })} />
                       ))}
                     </div>
                   </div>
                 </>
               )}
 
-              {/* Propriétés forme */}
-              {['rectangle', 'circle', 'triangle', 'line', 'arrow'].includes(selectedEl.type) && (
-                <>
-                  <div className="property-group">
-                    <label>Couleur</label>
-                    <div className="color-grid">
-                      {COLORS.map(color => (
-                        <button
-                          key={color}
-                          className={`color-swatch ${selectedEl.backgroundColor === color ? 'active' : ''}`}
-                          style={{ backgroundColor: color }}
-                          onClick={() => updateElement(selectedEl.id, { backgroundColor: color })}
-                        />
-                      ))}
-                    </div>
+              {/* 3. FOND & REMPLISSAGE (Sauf pour les lignes et images) */}
+              {!['line', 'image'].includes(selectedEl.type) && (
+                <div className="property-group">
+                  <label>Couleur du fond</label>
+                  <div className="color-grid">
+                    <button className={`color-swatch transparent ${selectedEl.backgroundColor === 'transparent' ? 'active' : ''}`} onClick={() => updateElement(selectedEl.id, { backgroundColor: 'transparent' })}>T</button>
+                    {COLORS.map(color => (
+                      <button key={color} className={`color-swatch ${selectedEl.backgroundColor === color ? 'active' : ''}`} style={{ backgroundColor: color }} onClick={() => updateElement(selectedEl.id, { backgroundColor: color })} />
+                    ))}
                   </div>
-
-                  {(selectedEl.type === 'rectangle' || selectedEl.type === 'image') && (
-                    <div className="property-group">
-                      <label>Arrondi</label>
-                      <input
-                        type="range"
-                        min="0"
-                        max="50"
-                        value={selectedEl.borderRadius || 0}
-                        onChange={(e) => updateElement(selectedEl.id, { borderRadius: Number(e.target.value) })}
-                      />
-                      <span className="range-value">{selectedEl.borderRadius || 0}px</span>
-                    </div>
-                  )}
-                </>
+                </div>
               )}
 
-              {/* Image */}
-              {selectedEl.type === 'image' && (
+              {/* 4. BORDURES (Rectangle, Cercle, Texte) */}
+              {['rectangle', 'circle'].includes(selectedEl.type) && (
+                <div className="property-group">
+                  <label>Bordure</label>
+                  <div className="color-grid" style={{ marginBottom: '8px' }}>
+                    <button className={`color-swatch transparent ${!selectedEl.borderWidth ? 'active' : ''}`} onClick={() => updateElement(selectedEl.id, { borderWidth: 0 })}>❌</button>
+                    {COLORS.map(color => (
+                      <button key={color} className={`color-swatch ${selectedEl.borderColor === color ? 'active' : ''}`} style={{ backgroundColor: color, border: '1px solid #ddd' }} onClick={() => updateElement(selectedEl.id, { borderColor: color, borderWidth: selectedEl.borderWidth || 2 })} />
+                    ))}
+                  </div>
+                  <label>Épaisseur</label>
+                  <input type="range" min="0" max="20" value={selectedEl.borderWidth || 0} onChange={(e) => updateElement(selectedEl.id, { borderWidth: Number(e.target.value) })} />
+                </div>
+              )}
+
+              {/* 5. ARRONDI (Rectangle, Image, Texte) */}
+              {['rectangle', 'image', 'text'].includes(selectedEl.type) && (
                 <div className="property-group">
                   <label>Arrondi</label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="50"
-                    value={selectedEl.borderRadius || 0}
-                    onChange={(e) => updateElement(selectedEl.id, { borderRadius: Number(e.target.value) })}
-                  />
+                  <input type="range" min="0" max="100" value={selectedEl.borderRadius || 0} onChange={(e) => updateElement(selectedEl.id, { borderRadius: Number(e.target.value) })} />
                   <span className="range-value">{selectedEl.borderRadius || 0}px</span>
                 </div>
               )}
 
-              {/* Actions */}
+              {/* 6. ACTIONS */}
               <div className="property-group actions">
-                <button className="action-btn duplicate" onClick={duplicateSelected}>
-                  📋 Dupliquer
-                </button>
-                <button className="action-btn delete" onClick={deleteSelected}>
-                  🗑️ Supprimer
-                </button>
+                <button className="action-btn duplicate" onClick={duplicateSelected}>📋 Dupliquer</button>
+                <button className="action-btn delete" onClick={deleteSelected}>🗑️ Supprimer</button>
               </div>
             </div>
           ) : (
-            <div className="properties-panel">
-              <h3>Fond</h3>
-              <div className="property-group">
-                <label>Couleur</label>
-                <div className="color-grid">
-                  {COLORS.map(color => (
-                    <button
-                      key={color}
-                      className={`color-swatch ${backgroundColor === color ? 'active' : ''}`}
-                      style={{ backgroundColor: color }}
-                      onClick={() => setBackgroundColor(color)}
-                    />
-                  ))}
-                </div>
-                <input
-                  type="color"
-                  value={backgroundColor.startsWith('#') ? backgroundColor : '#ffffff'}
-                  onChange={(e) => setBackgroundColor(e.target.value)}
-                  className="custom-color"
-                />
-              </div>
-              <p className="hint">Sélectionnez un élément pour modifier ses propriétés</p>
-            </div>
+            <div className="no-selection">Sélectionnez un élément pour le modifier</div>
           )}
         </aside>
       </div>
