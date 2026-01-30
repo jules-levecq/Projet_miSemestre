@@ -288,6 +288,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span>Choisir un emoji</span>
                 <button class="emoji-picker-close" onclick="closeEmojiPicker()">✕</button>
             </div>
+            <div class="emoji-input-section">
+                <input type="text" class="emoji-input" id="emojiInput" placeholder="Tapez ou collez un emoji..." maxlength="2" data-project-id="${projectId}">
+                <span class="emoji-hint">💡 Win + .  |  Ctrl + .  |  Cmd + Ctrl + Espace</span>
+            </div>
+            <div class="emoji-picker-divider"><span>ou choisissez parmi</span></div>
             <div class="emoji-picker-grid">
                 ${AVAILABLE_EMOJIS.map(e => `<span class="emoji-option" onclick="selectEmoji(event, ${projectId}, '${e}')">${e}</span>`).join('')}
             </div>
@@ -296,10 +301,39 @@ document.addEventListener('DOMContentLoaded', () => {
         // Positionner le picker près du clic
         const rect = event.target.getBoundingClientRect();
         picker.style.position = 'fixed';
-        picker.style.top = `${Math.min(rect.bottom + 10, window.innerHeight - 350)}px`;
+        picker.style.top = `${Math.min(rect.bottom + 10, window.innerHeight - 420)}px`;
         picker.style.left = `${Math.min(rect.left, window.innerWidth - 320)}px`;
         
         document.body.appendChild(picker);
+        
+        // Focus sur l'input
+        const input = document.getElementById('emojiInput');
+        input.focus();
+        
+        // Gérer la saisie d'emoji dans l'input
+        input.addEventListener('input', function(e) {
+            const value = e.target.value;
+            // Vérifier si c'est un emoji (caractère non-ASCII ou emoji)
+            if (value && /\p{Emoji}/u.test(value)) {
+                // Extraire le premier emoji
+                const emojiMatch = value.match(/\p{Emoji_Presentation}|\p{Emoji}\uFE0F?/u);
+                if (emojiMatch) {
+                    selectEmoji(e, projectId, emojiMatch[0]);
+                }
+            }
+        });
+        
+        // Valider avec Entrée
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && this.value) {
+                const emojiMatch = this.value.match(/\p{Emoji_Presentation}|\p{Emoji}\uFE0F?/u);
+                if (emojiMatch) {
+                    selectEmoji(e, projectId, emojiMatch[0]);
+                }
+            } else if (e.key === 'Escape') {
+                closeEmojiPicker();
+            }
+        });
         
         // Fermer en cliquant ailleurs
         setTimeout(() => {
