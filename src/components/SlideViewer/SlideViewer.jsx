@@ -297,7 +297,6 @@ function SlideViewer({ nodes, edges, startSlideId, onClose }) {
       {/* Message si aucune slide suivante */}
       {showNavigation && nextSlides.length === 0 && (
         <div className="viewer-end">
-          <p>🎉 Fin de la présentation</p>
           {canGoBack() && (
             <button onClick={goBack} className="back-to-previous">
               ← Retour
