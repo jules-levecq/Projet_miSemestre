@@ -146,120 +146,130 @@
 /* Navigation vers slides suivantes */
 .viewer-next-slides {
   position: absolute;
-  bottom: 20px;
+  bottom: 30px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(10px);
-  padding: 16px 24px;
-  border-radius: 16px;
-  max-width: 90vw;
   transition: opacity 0.3s;
 }
 
-.next-label {
-  color: #aaa;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 12px;
-  text-align: center;
+/* Bouton unique (une seule slide suivante) */
+.next-slide-single {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 28px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.next-slide-single:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.next-slide-single .next-arrow {
+  font-size: 20px;
+  transition: transform 0.3s;
+}
+
+.next-slide-single:hover .next-arrow {
+  transform: translateX(4px);
+}
+
+/* Grille de boutons (plusieurs slides) */
 .next-slides-grid {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
   justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(20px);
+  padding: 12px 16px;
+  border-radius: 16px;
 }
 
 .next-slide-btn {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 20px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  border: none;
-  border-radius: 12px;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
   color: white;
   font-size: 14px;
   cursor: pointer;
   transition: all 0.2s;
-  min-width: 150px;
 }
 
 .next-slide-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
 }
 
 .shortcut-key {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
-  background: rgba(255, 255, 255, 0.2);
+  width: 22px;
+  height: 22px;
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 6px;
-  font-weight: bold;
+  font-weight: 600;
   font-size: 12px;
 }
 
 .next-slide-name {
-  flex: 1;
-  text-align: left;
-}
-
-.next-slide-arrow {
-  font-size: 18px;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Fin du chemin */
 .viewer-end {
   position: absolute;
-  bottom: 20px;
+  bottom: 30px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(10px);
-  padding: 20px 30px;
-  border-radius: 16px;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(20px);
+  padding: 14px 20px;
+  border-radius: 50px;
 }
 
 .viewer-end p {
   color: white;
-  font-size: 18px;
-  margin-bottom: 16px;
+  font-size: 16px;
+  margin: 0;
 }
 
 .back-to-previous,
 .exit-viewer {
   padding: 10px 20px;
-  margin: 0 8px;
-  border: none;
-  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 25px;
   font-size: 14px;
   cursor: pointer;
   transition: all 0.2s;
-}
-
-.back-to-previous {
-  background: #3498db;
+  background: rgba(255, 255, 255, 0.1);
   color: white;
 }
 
-.back-to-previous:hover {
-  background: #2980b9;
-}
-
-.exit-viewer {
-  background: #27ae60;
-  color: white;
-}
-
+.back-to-previous:hover,
 .exit-viewer:hover {
-  background: #219a52;
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
 }
 
 /* Aide en bas */

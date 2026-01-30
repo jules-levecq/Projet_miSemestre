@@ -41,6 +41,15 @@ function SlideViewer({ nodes, edges, startSlideId, onClose }) {
   const nextSlides = getNextSlides();
   const previousSlides = getPreviousSlides();
 
+  // Vérifier si le retour est possible (historique + arête bidirectionnelle)
+  const canGoBack = useCallback(() => {
+    if (history.length === 0) return false;
+    const previousId = history[history.length - 1];
+    const forwardEdge = edges.find(e => e.source === previousId && e.target === currentSlideId);
+    const reverseEdge = edges.find(e => e.source === currentSlideId && e.target === previousId);
+    return !!forwardEdge && (forwardEdge.markerStart === 'arrow' || !!reverseEdge);
+  }, [history, edges, currentSlideId]);
+
   // Activer le mode plein écran lors du montage
   useEffect(() => {
     const enterFullscreen = async () => {
@@ -187,13 +196,13 @@ function SlideViewer({ nodes, edges, startSlideId, onClose }) {
         {warning && (
           <div className="viewer-warning" style={{ color: '#ffcc00', marginLeft: 12 }}>{warning}</div>
         )}
-        {history.length > 0 && (
+        {canGoBack() && (
           <button 
             className="control-btn back-btn" 
             onClick={goBack}
             title="Retour (← ou Backspace)"
           >
-            ← Retour
+            ←
           </button>
         )}
       </div>
@@ -259,35 +268,43 @@ function SlideViewer({ nodes, edges, startSlideId, onClose }) {
       {/* Navigation vers les slides suivantes */}
       {showNavigation && nextSlides.length > 0 && (
         <div className="viewer-next-slides">
-          <p className="next-label">Slides suivantes :</p>
-          <div className="next-slides-grid">
-            {nextSlides.map((slide, index) => (
-              <button
-                key={slide.id}
-                className="next-slide-btn"
-                onClick={() => navigateTo(slide.id)}
-                title={`Touche ${index + 1}`}
-              >
-                <span className="shortcut-key">{index + 1}</span>
-                <span className="next-slide-name">{slide.data.label || slide.id}</span>
-                <span className="next-slide-arrow">→</span>
-              </button>
-            ))}
-          </div>
+          {nextSlides.length === 1 ? (
+            <button
+              className="next-slide-single"
+              onClick={() => navigateTo(nextSlides[0].id)}
+            >
+              <span className="next-slide-name">{nextSlides[0].data.label || 'Suivant'}</span>
+              <span className="next-arrow">→</span>
+            </button>
+          ) : (
+            <div className="next-slides-grid">
+              {nextSlides.map((slide, index) => (
+                <button
+                  key={slide.id}
+                  className="next-slide-btn"
+                  onClick={() => navigateTo(slide.id)}
+                  title={`Touche ${index + 1}`}
+                >
+                  <span className="shortcut-key">{index + 1}</span>
+                  <span className="next-slide-name">{slide.data.label || slide.id}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
       {/* Message si aucune slide suivante */}
       {showNavigation && nextSlides.length === 0 && (
         <div className="viewer-end">
-          <p>🎉 Fin de ce chemin</p>
-          {history.length > 0 && (
+          <p>🎉 Fin de la présentation</p>
+          {canGoBack() && (
             <button onClick={goBack} className="back-to-previous">
-              ← Revenir en arrière
+              ← Retour
             </button>
           )}
           <button onClick={onClose} className="exit-viewer">
-            Quitter la présentation
+            Quitter
           </button>
         </div>
       )}
