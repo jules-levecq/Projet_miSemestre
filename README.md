@@ -192,6 +192,12 @@ Projet_miSemestre/
 - Spring Boot : https://spring.io/projects/spring-boot
 - Vite : https://vitejs.dev/
 
+## 📄 Documentation supplémentaire
+- `docs/ARCHITECTURE.md` : Détails architecturaux (frontend/backend, sérialisation, flux de sauvegarde)
+- `docs/API.md` : Référence des endpoints backend et exemples de payloads
+- `docs/DEV_SETUP.md` : Guide d'installation et démarrage en développement
+- `CONTRIBUTING.md` : Guide pour contribuer au projet
+
 ## 👥 Équipe
 
 Projet réalisé dans le cadre du semestre universitaire.
