@@ -1,69 +1,269 @@
 import { useState, useRef, useEffect } from 'react';
 import './SlideEditor.css';
 
-// Templates prédéfinis
+// Templates prédéfinis - Design moderne et professionnel
 const TEMPLATES = [
+  // ===== TEMPLATES BASIQUES =====
   {
     id: 'blank',
     name: 'Vierge',
     preview: '⬜',
+    category: 'Basique',
     elements: [],
     backgroundColor: '#ffffff',
   },
   {
-    id: 'title',
-    name: 'Titre',
-    preview: '📝',
+    id: 'title-centered',
+    name: 'Titre centré',
+    preview: '🎯',
+    category: 'Basique',
     backgroundColor: '#1a1a2e',
     elements: [
-      { id: 1, type: 'text', x: 100, y: 200, width: 600, height: 80, content: 'Titre principal', fontSize: 48, fontWeight: 'bold', color: '#ffffff', align: 'center' },
-      { id: 2, type: 'text', x: 150, y: 300, width: 500, height: 40, content: 'Sous-titre de la présentation', fontSize: 24, color: '#888888', align: 'center' },
+      { id: 1, type: 'text', x: 100, y: 180, width: 600, height: 80, content: 'Titre principal', fontSize: 52, fontWeight: 'bold', color: '#ffffff', align: 'center' },
+      { id: 2, type: 'text', x: 150, y: 280, width: 500, height: 40, content: 'Sous-titre de la présentation', fontSize: 22, color: '#a0a0a0', align: 'center' },
+      { id: 3, type: 'rectangle', x: 350, y: 350, width: 100, height: 4, backgroundColor: '#4f46e5', borderRadius: 2 },
     ],
   },
   {
-    id: 'content',
-    name: 'Contenu',
+    id: 'content-simple',
+    name: 'Contenu simple',
     preview: '📄',
+    category: 'Basique',
     backgroundColor: '#ffffff',
     elements: [
-      { id: 1, type: 'text', x: 50, y: 40, width: 700, height: 50, content: 'Titre de la slide', fontSize: 36, fontWeight: 'bold', color: '#333333' },
-      { id: 2, type: 'rectangle', x: 50, y: 100, width: 700, height: 3, backgroundColor: '#4285f4', borderRadius: 2 },
-      { id: 3, type: 'text', x: 50, y: 130, width: 700, height: 300, content: 'Votre contenu ici...', fontSize: 18, color: '#555555' },
+      { id: 1, type: 'text', x: 50, y: 35, width: 700, height: 50, content: 'Titre de la slide', fontSize: 38, fontWeight: 'bold', color: '#1f2937' },
+      { id: 2, type: 'rectangle', x: 50, y: 95, width: 120, height: 5, backgroundColor: '#3b82f6', borderRadius: 3 },
+      { id: 3, type: 'text', x: 50, y: 130, width: 700, height: 320, content: '• Premier point important\n\n• Deuxième point à développer\n\n• Troisième élément clé\n\n• Conclusion ou call-to-action', fontSize: 20, color: '#4b5563', lineHeight: 1.6 },
+    ],
+  },
+
+  // ===== TEMPLATES PROFESSIONNELS =====
+  {
+    id: 'corporate-intro',
+    name: 'Introduction Pro',
+    preview: '💼',
+    category: 'Professionnel',
+    backgroundColor: '#0f172a',
+    elements: [
+      { id: 1, type: 'rectangle', x: 0, y: 0, width: 300, height: 500, backgroundColor: '#1e40af', borderRadius: 0 },
+      { id: 2, type: 'text', x: 40, y: 180, width: 220, height: 80, content: 'VOTRE\nLOGO', fontSize: 32, fontWeight: 'bold', color: '#ffffff', align: 'center' },
+      { id: 3, type: 'text', x: 340, y: 150, width: 420, height: 60, content: 'Présentation Entreprise', fontSize: 36, fontWeight: 'bold', color: '#ffffff' },
+      { id: 4, type: 'text', x: 340, y: 220, width: 420, height: 80, content: 'Votre slogan ou baseline ici', fontSize: 20, color: '#94a3b8' },
+      { id: 5, type: 'rectangle', x: 340, y: 320, width: 150, height: 45, backgroundColor: '#3b82f6', borderRadius: 8 },
+      { id: 6, type: 'text', x: 355, y: 330, width: 120, height: 30, content: 'Découvrir →', fontSize: 16, fontWeight: 'bold', color: '#ffffff', align: 'center' },
     ],
   },
   {
-    id: 'twoColumns',
+    id: 'stats-dashboard',
+    name: 'Statistiques',
+    preview: '📊',
+    category: 'Professionnel',
+    backgroundColor: '#f8fafc',
+    elements: [
+      { id: 1, type: 'text', x: 50, y: 25, width: 700, height: 45, content: 'Chiffres clés', fontSize: 32, fontWeight: 'bold', color: '#1e293b' },
+      { id: 2, type: 'rectangle', x: 50, y: 90, width: 200, height: 120, backgroundColor: '#dbeafe', borderRadius: 12 },
+      { id: 3, type: 'text', x: 70, y: 110, width: 160, height: 50, content: '2.5M', fontSize: 36, fontWeight: 'bold', color: '#1d4ed8', align: 'center' },
+      { id: 4, type: 'text', x: 70, y: 160, width: 160, height: 30, content: 'Utilisateurs', fontSize: 14, color: '#64748b', align: 'center' },
+      { id: 5, type: 'rectangle', x: 300, y: 90, width: 200, height: 120, backgroundColor: '#dcfce7', borderRadius: 12 },
+      { id: 6, type: 'text', x: 320, y: 110, width: 160, height: 50, content: '+45%', fontSize: 36, fontWeight: 'bold', color: '#16a34a', align: 'center' },
+      { id: 7, type: 'text', x: 320, y: 160, width: 160, height: 30, content: 'Croissance', fontSize: 14, color: '#64748b', align: 'center' },
+      { id: 8, type: 'rectangle', x: 550, y: 90, width: 200, height: 120, backgroundColor: '#fef3c7', borderRadius: 12 },
+      { id: 9, type: 'text', x: 570, y: 110, width: 160, height: 50, content: '98%', fontSize: 36, fontWeight: 'bold', color: '#d97706', align: 'center' },
+      { id: 10, type: 'text', x: 570, y: 160, width: 160, height: 30, content: 'Satisfaction', fontSize: 14, color: '#64748b', align: 'center' },
+      { id: 11, type: 'rectangle', x: 50, y: 240, width: 700, height: 200, backgroundColor: '#ffffff', borderRadius: 12 },
+      { id: 12, type: 'text', x: 70, y: 260, width: 660, height: 160, content: '📈 Zone pour graphique ou analyse détaillée', fontSize: 18, color: '#94a3b8', align: 'center' },
+    ],
+  },
+  {
+    id: 'timeline',
+    name: 'Chronologie',
+    preview: '📅',
+    category: 'Professionnel',
+    backgroundColor: '#ffffff',
+    elements: [
+      { id: 1, type: 'text', x: 50, y: 30, width: 700, height: 45, content: 'Notre parcours', fontSize: 32, fontWeight: 'bold', color: '#1f2937' },
+      { id: 2, type: 'rectangle', x: 100, y: 250, width: 600, height: 4, backgroundColor: '#e5e7eb', borderRadius: 2 },
+      { id: 3, type: 'circle', x: 100, y: 238, width: 28, height: 28, backgroundColor: '#3b82f6', borderRadius: 14 },
+      { id: 4, type: 'text', x: 70, y: 150, width: 90, height: 70, content: '2020\nCréation', fontSize: 14, fontWeight: 'bold', color: '#3b82f6', align: 'center' },
+      { id: 5, type: 'circle', x: 300, y: 238, width: 28, height: 28, backgroundColor: '#8b5cf6', borderRadius: 14 },
+      { id: 6, type: 'text', x: 270, y: 280, width: 90, height: 70, content: '2022\nExpansion', fontSize: 14, fontWeight: 'bold', color: '#8b5cf6', align: 'center' },
+      { id: 7, type: 'circle', x: 500, y: 238, width: 28, height: 28, backgroundColor: '#10b981', borderRadius: 14 },
+      { id: 8, type: 'text', x: 470, y: 150, width: 90, height: 70, content: '2024\nSuccès', fontSize: 14, fontWeight: 'bold', color: '#10b981', align: 'center' },
+      { id: 9, type: 'circle', x: 680, y: 238, width: 28, height: 28, backgroundColor: '#f59e0b', borderRadius: 14 },
+      { id: 10, type: 'text', x: 645, y: 280, width: 100, height: 70, content: '2026\nVision', fontSize: 14, fontWeight: 'bold', color: '#f59e0b', align: 'center' },
+    ],
+  },
+
+  // ===== TEMPLATES COMPARAISON =====
+  {
+    id: 'two-columns',
     name: 'Deux colonnes',
     preview: '▥',
-    backgroundColor: '#f8f9fa',
+    category: 'Comparaison',
+    backgroundColor: '#f1f5f9',
     elements: [
-      { id: 1, type: 'text', x: 50, y: 30, width: 700, height: 40, content: 'Comparaison', fontSize: 32, fontWeight: 'bold', color: '#333' },
-      { id: 2, type: 'rectangle', x: 50, y: 90, width: 330, height: 350, backgroundColor: '#e3f2fd', borderRadius: 12 },
-      { id: 3, type: 'rectangle', x: 420, y: 90, width: 330, height: 350, backgroundColor: '#fce4ec', borderRadius: 12 },
-      { id: 4, type: 'text', x: 70, y: 110, width: 290, height: 30, content: 'Option A', fontSize: 20, fontWeight: 'bold', color: '#1976d2' },
-      { id: 5, type: 'text', x: 440, y: 110, width: 290, height: 30, content: 'Option B', fontSize: 20, fontWeight: 'bold', color: '#c2185b' },
+      { id: 1, type: 'text', x: 50, y: 25, width: 700, height: 45, content: 'Comparaison', fontSize: 32, fontWeight: 'bold', color: '#1e293b' },
+      { id: 2, type: 'rectangle', x: 50, y: 85, width: 335, height: 370, backgroundColor: '#ffffff', borderRadius: 16 },
+      { id: 3, type: 'rectangle', x: 415, y: 85, width: 335, height: 370, backgroundColor: '#ffffff', borderRadius: 16 },
+      { id: 4, type: 'rectangle', x: 70, y: 105, width: 60, height: 60, backgroundColor: '#dbeafe', borderRadius: 12 },
+      { id: 5, type: 'text', x: 82, y: 118, width: 36, height: 36, content: '✓', fontSize: 28, color: '#2563eb', align: 'center' },
+      { id: 6, type: 'text', x: 145, y: 115, width: 220, height: 40, content: 'Option A', fontSize: 24, fontWeight: 'bold', color: '#1e293b' },
+      { id: 7, type: 'text', x: 70, y: 180, width: 295, height: 250, content: '• Avantage 1\n\n• Avantage 2\n\n• Avantage 3', fontSize: 16, color: '#64748b' },
+      { id: 8, type: 'rectangle', x: 435, y: 105, width: 60, height: 60, backgroundColor: '#fce7f3', borderRadius: 12 },
+      { id: 9, type: 'text', x: 447, y: 118, width: 36, height: 36, content: '★', fontSize: 28, color: '#db2777', align: 'center' },
+      { id: 10, type: 'text', x: 510, y: 115, width: 220, height: 40, content: 'Option B', fontSize: 24, fontWeight: 'bold', color: '#1e293b' },
+      { id: 11, type: 'text', x: 435, y: 180, width: 295, height: 250, content: '• Avantage 1\n\n• Avantage 2\n\n• Avantage 3', fontSize: 16, color: '#64748b' },
     ],
   },
   {
-    id: 'image',
-    name: 'Image + Texte',
-    preview: '🖼️',
-    backgroundColor: '#ffffff',
+    id: 'pros-cons',
+    name: 'Pour / Contre',
+    preview: '⚖️',
+    category: 'Comparaison',
+    backgroundColor: '#18181b',
     elements: [
-      { id: 1, type: 'rectangle', x: 50, y: 50, width: 350, height: 400, backgroundColor: '#e0e0e0', borderRadius: 8 },
-      { id: 2, type: 'text', x: 140, y: 230, width: 170, height: 40, content: '🖼️ Image', fontSize: 24, color: '#999', align: 'center' },
-      { id: 3, type: 'text', x: 450, y: 50, width: 300, height: 40, content: 'Titre', fontSize: 28, fontWeight: 'bold', color: '#333' },
-      { id: 4, type: 'text', x: 450, y: 110, width: 300, height: 300, content: 'Description de l\'image et contenu additionnel...', fontSize: 16, color: '#666' },
+      { id: 1, type: 'text', x: 250, y: 30, width: 300, height: 45, content: 'Analyse', fontSize: 32, fontWeight: 'bold', color: '#ffffff', align: 'center' },
+      { id: 2, type: 'rectangle', x: 50, y: 90, width: 335, height: 360, backgroundColor: '#052e16', borderRadius: 16 },
+      { id: 3, type: 'text', x: 70, y: 110, width: 295, height: 40, content: '✓ Avantages', fontSize: 22, fontWeight: 'bold', color: '#4ade80' },
+      { id: 4, type: 'text', x: 70, y: 160, width: 295, height: 270, content: '• Point positif 1\n\n• Point positif 2\n\n• Point positif 3', fontSize: 16, color: '#86efac' },
+      { id: 5, type: 'rectangle', x: 415, y: 90, width: 335, height: 360, backgroundColor: '#450a0a', borderRadius: 16 },
+      { id: 6, type: 'text', x: 435, y: 110, width: 295, height: 40, content: '✗ Inconvénients', fontSize: 22, fontWeight: 'bold', color: '#f87171' },
+      { id: 7, type: 'text', x: 435, y: 160, width: 295, height: 270, content: '• Point négatif 1\n\n• Point négatif 2\n\n• Point négatif 3', fontSize: 16, color: '#fca5a5' },
     ],
   },
+
+  // ===== TEMPLATES CRÉATIFS =====
   {
-    id: 'gradient',
-    name: 'Gradient',
+    id: 'gradient-modern',
+    name: 'Gradient moderne',
     preview: '🌈',
+    category: 'Créatif',
     backgroundColor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
     elements: [
-      { id: 1, type: 'text', x: 100, y: 180, width: 600, height: 60, content: 'Slide moderne', fontSize: 42, fontWeight: 'bold', color: '#ffffff', align: 'center' },
-      { id: 2, type: 'text', x: 150, y: 260, width: 500, height: 40, content: 'Avec un arrière-plan en dégradé', fontSize: 20, color: 'rgba(255,255,255,0.8)', align: 'center' },
+      { id: 1, type: 'text', x: 100, y: 160, width: 600, height: 70, content: 'Innovation', fontSize: 56, fontWeight: 'bold', color: '#ffffff', align: 'center' },
+      { id: 2, type: 'text', x: 150, y: 250, width: 500, height: 40, content: 'Créez l\'impossible', fontSize: 24, color: 'rgba(255,255,255,0.85)', align: 'center' },
+      { id: 3, type: 'rectangle', x: 300, y: 320, width: 200, height: 50, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 25 },
+      { id: 4, type: 'text', x: 315, y: 332, width: 170, height: 30, content: 'En savoir plus', fontSize: 16, fontWeight: 'bold', color: '#ffffff', align: 'center' },
+    ],
+  },
+  {
+    id: 'dark-elegant',
+    name: 'Sombre élégant',
+    preview: '🌙',
+    category: 'Créatif',
+    backgroundColor: '#0a0a0a',
+    elements: [
+      { id: 1, type: 'rectangle', x: 50, y: 50, width: 3, height: 400, backgroundColor: '#fbbf24', borderRadius: 2 },
+      { id: 2, type: 'text', x: 80, y: 120, width: 650, height: 70, content: 'Excellence', fontSize: 58, fontWeight: 'bold', color: '#fbbf24' },
+      { id: 3, type: 'text', x: 80, y: 200, width: 600, height: 40, content: 'Votre message impactant ici', fontSize: 22, color: '#d4d4d4' },
+      { id: 4, type: 'text', x: 80, y: 380, width: 300, height: 30, content: '— Votre signature', fontSize: 16, color: '#737373' },
+    ],
+  },
+  {
+    id: 'neon-glow',
+    name: 'Néon',
+    preview: '✨',
+    category: 'Créatif',
+    backgroundColor: '#0f0f23',
+    elements: [
+      { id: 1, type: 'rectangle', x: 100, y: 130, width: 600, height: 240, backgroundColor: 'transparent', borderRadius: 20 },
+      { id: 2, type: 'text', x: 120, y: 180, width: 560, height: 80, content: 'FUTURE', fontSize: 72, fontWeight: 'bold', color: '#00ffff', align: 'center' },
+      { id: 3, type: 'text', x: 200, y: 280, width: 400, height: 40, content: 'is now', fontSize: 28, color: '#ff00ff', align: 'center' },
+      { id: 4, type: 'circle', x: 50, y: 50, width: 20, height: 20, backgroundColor: '#00ff00', borderRadius: 10 },
+      { id: 5, type: 'circle', x: 730, y: 430, width: 20, height: 20, backgroundColor: '#ff0080', borderRadius: 10 },
+    ],
+  },
+
+  // ===== TEMPLATES MÉDIA =====
+  {
+    id: 'image-left',
+    name: 'Image à gauche',
+    preview: '🖼️',
+    category: 'Média',
+    backgroundColor: '#ffffff',
+    elements: [
+      { id: 1, type: 'rectangle', x: 40, y: 40, width: 350, height: 420, backgroundColor: '#f3f4f6', borderRadius: 16 },
+      { id: 2, type: 'text', x: 140, y: 230, width: 150, height: 40, content: '🖼️ Image', fontSize: 24, color: '#9ca3af', align: 'center' },
+      { id: 3, type: 'text', x: 430, y: 60, width: 330, height: 45, content: 'Titre impactant', fontSize: 30, fontWeight: 'bold', color: '#111827' },
+      { id: 4, type: 'rectangle', x: 430, y: 115, width: 80, height: 4, backgroundColor: '#6366f1', borderRadius: 2 },
+      { id: 5, type: 'text', x: 430, y: 145, width: 330, height: 280, content: 'Décrivez votre image ou ajoutez des points clés :\n\n• Point important 1\n\n• Point important 2\n\n• Point important 3', fontSize: 16, color: '#4b5563' },
+    ],
+  },
+  {
+    id: 'image-full',
+    name: 'Image plein écran',
+    preview: '🏞️',
+    category: 'Média',
+    backgroundColor: '#000000',
+    elements: [
+      { id: 1, type: 'rectangle', x: 0, y: 0, width: 800, height: 500, backgroundColor: '#1f2937', borderRadius: 0 },
+      { id: 2, type: 'text', x: 300, y: 220, width: 200, height: 60, content: '🖼️ Image\nplein écran', fontSize: 24, color: '#6b7280', align: 'center' },
+      { id: 3, type: 'rectangle', x: 0, y: 380, width: 800, height: 120, backgroundColor: 'rgba(0,0,0,0.7)', borderRadius: 0 },
+      { id: 4, type: 'text', x: 40, y: 400, width: 720, height: 40, content: 'Légende ou titre de l\'image', fontSize: 24, fontWeight: 'bold', color: '#ffffff' },
+      { id: 5, type: 'text', x: 40, y: 445, width: 720, height: 30, content: 'Description complémentaire si nécessaire', fontSize: 14, color: '#d1d5db' },
+    ],
+  },
+
+  // ===== TEMPLATES CITATION =====
+  {
+    id: 'quote-minimal',
+    name: 'Citation minimale',
+    preview: '💬',
+    category: 'Citation',
+    backgroundColor: '#fafafa',
+    elements: [
+      { id: 1, type: 'text', x: 50, y: 100, width: 80, height: 100, content: '"', fontSize: 120, fontWeight: 'bold', color: '#e5e5e5' },
+      { id: 2, type: 'text', x: 100, y: 160, width: 600, height: 150, content: 'La simplicité est la sophistication suprême.', fontSize: 32, color: '#262626', align: 'center' },
+      { id: 3, type: 'rectangle', x: 350, y: 340, width: 100, height: 3, backgroundColor: '#a3a3a3', borderRadius: 2 },
+      { id: 4, type: 'text', x: 250, y: 370, width: 300, height: 30, content: '— Léonard de Vinci', fontSize: 16, color: '#737373', align: 'center' },
+    ],
+  },
+  {
+    id: 'quote-modern',
+    name: 'Citation moderne',
+    preview: '🗨️',
+    category: 'Citation',
+    backgroundColor: 'linear-gradient(180deg, #1e3a5f 0%, #0f1729 100%)',
+    elements: [
+      { id: 1, type: 'rectangle', x: 60, y: 60, width: 680, height: 380, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 20 },
+      { id: 2, type: 'text', x: 80, y: 80, width: 100, height: 80, content: '❝', fontSize: 64, color: '#60a5fa' },
+      { id: 3, type: 'text', x: 100, y: 150, width: 600, height: 150, content: 'Votre citation inspirante ici', fontSize: 28, color: '#ffffff', align: 'center' },
+      { id: 4, type: 'circle', x: 350, y: 320, width: 100, height: 100, backgroundColor: '#374151', borderRadius: 50 },
+      { id: 5, type: 'text', x: 365, y: 355, width: 70, height: 30, content: '👤', fontSize: 36, align: 'center' },
+      { id: 6, type: 'text', x: 250, y: 430, width: 300, height: 25, content: 'Nom de l\'auteur', fontSize: 14, fontWeight: 'bold', color: '#93c5fd', align: 'center' },
+    ],
+  },
+
+  // ===== TEMPLATE FIN =====
+  {
+    id: 'thank-you',
+    name: 'Remerciements',
+    preview: '🙏',
+    category: 'Fin',
+    backgroundColor: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+    elements: [
+      { id: 1, type: 'text', x: 100, y: 150, width: 600, height: 80, content: 'Merci !', fontSize: 64, fontWeight: 'bold', color: '#ffffff', align: 'center' },
+      { id: 2, type: 'text', x: 150, y: 250, width: 500, height: 40, content: 'Des questions ?', fontSize: 24, color: 'rgba(255,255,255,0.9)', align: 'center' },
+      { id: 3, type: 'rectangle', x: 250, y: 330, width: 300, height: 60, backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 30 },
+      { id: 4, type: 'text', x: 270, y: 345, width: 260, height: 30, content: '📧 contact@email.com', fontSize: 16, color: '#ffffff', align: 'center' },
+    ],
+  },
+  {
+    id: 'contact-end',
+    name: 'Contact',
+    preview: '📞',
+    category: 'Fin',
+    backgroundColor: '#111827',
+    elements: [
+      { id: 1, type: 'text', x: 100, y: 80, width: 600, height: 50, content: 'Restons en contact', fontSize: 36, fontWeight: 'bold', color: '#ffffff', align: 'center' },
+      { id: 2, type: 'rectangle', x: 150, y: 160, width: 500, height: 280, backgroundColor: '#1f2937', borderRadius: 20 },
+      { id: 3, type: 'text', x: 200, y: 190, width: 400, height: 35, content: '📧  email@exemple.com', fontSize: 18, color: '#d1d5db' },
+      { id: 4, type: 'text', x: 200, y: 240, width: 400, height: 35, content: '🌐  www.votresite.com', fontSize: 18, color: '#d1d5db' },
+      { id: 5, type: 'text', x: 200, y: 290, width: 400, height: 35, content: '📱  +33 1 23 45 67 89', fontSize: 18, color: '#d1d5db' },
+      { id: 6, type: 'text', x: 200, y: 340, width: 400, height: 35, content: '📍  Paris, France', fontSize: 18, color: '#d1d5db' },
+      { id: 7, type: 'rectangle', x: 280, y: 400, width: 50, height: 50, backgroundColor: '#3b82f6', borderRadius: 10 },
+      { id: 8, type: 'rectangle', x: 350, y: 400, width: 50, height: 50, backgroundColor: '#ec4899', borderRadius: 10 },
+      { id: 9, type: 'rectangle', x: 420, y: 400, width: 50, height: 50, backgroundColor: '#10b981', borderRadius: 10 },
     ],
   },
 ];
@@ -967,21 +1167,29 @@ function SlideEditor({ slide, onSave, onClose }) {
         <div className="templates-modal" onClick={() => setShowTemplates(false)}>
           <div className="templates-content" onClick={e => e.stopPropagation()}>
             <h2>Choisir un template</h2>
-            <div className="templates-grid">
-              {TEMPLATES.map(template => (
-                <button
-                  key={template.id}
-                  className="template-card"
-                  onClick={() => applyTemplate(template)}
-                >
-                  <div
-                    className="template-preview"
-                    style={{ background: template.backgroundColor }}
-                  >
-                    <span>{template.preview}</span>
+            <div className="templates-categories">
+              {/* Grouper les templates par catégorie */}
+              {[...new Set(TEMPLATES.map(t => t.category || 'Autre'))].map(category => (
+                <div key={category} className="template-category">
+                  <h3 className="category-title">{category}</h3>
+                  <div className="templates-grid">
+                    {TEMPLATES.filter(t => (t.category || 'Autre') === category).map(template => (
+                      <button
+                        key={template.id}
+                        className="template-card"
+                        onClick={() => applyTemplate(template)}
+                      >
+                        <div
+                          className="template-preview"
+                          style={{ background: template.backgroundColor }}
+                        >
+                          <span>{template.preview}</span>
+                        </div>
+                        <span className="template-name">{template.name}</span>
+                      </button>
+                    ))}
                   </div>
-                  <span className="template-name">{template.name}</span>
-                </button>
+                </div>
               ))}
             </div>
             <button className="close-modal" onClick={() => setShowTemplates(false)}>
