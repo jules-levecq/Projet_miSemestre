@@ -238,6 +238,7 @@
    ============================================ */
 
 .slide-node {
+  position: relative;
   padding: 15px;
   border: 2px solid #222;
   border-radius: 8px;
@@ -266,6 +267,35 @@
 .react-flow__node.selected .slide-node {
   border-color: #4CAF50;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================
+   PREMIÈRE SLIDE (Ctrl+clic)
+   Style pour indiquer la slide de départ du diapo
+   ============================================ */
+
+.react-flow__node.first-slide .slide-node {
+  border-color: #ff6b35;
+  border-width: 3px;
+  box-shadow: 0 0 12px rgba(255, 107, 53, 0.5);
+}
+
+.react-flow__node.first-slide .slide-node::before {
+  content: '1';
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  width: 20px;
+  height: 20px;
+  background: #ff6b35;
+  color: white;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 /* Marquee selection rectangle for global flow view */

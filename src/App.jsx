@@ -347,6 +347,10 @@ function App() {
   const [isViewing, setIsViewing] = useState(false);
   const [viewerStartSlide, setViewerStartSlide] = useState(null);
 
+  // State for the first slide (Ctrl+click to set)
+  // This slide will be highlighted and used as the starting point
+  const [firstSlideId, setFirstSlideId] = useState(null);
+
   // ============================================
   // EFFECT - Load existing project from DB
   // ============================================
@@ -492,13 +496,13 @@ function App() {
       return;
     }
     
-    // If no start slide specified, use the selected slide or the first slide
+    // Priority: passed startSlideId > firstSlideId (Ctrl+click) > selected slide > first slide
     const selectedNode = nodes.find(n => n.selected);
-    const startId = startSlideId || selectedNode?.id || nodes[0]?.id;
+    const startId = startSlideId || firstSlideId || selectedNode?.id || nodes[0]?.id;
     
     setViewerStartSlide(startId);
     setIsViewing(true);
-  }, [nodes]);
+  }, [nodes, firstSlideId]);
 
   /**
    * closePresentation - Exit the presentation mode
@@ -507,6 +511,20 @@ function App() {
     setIsViewing(false);
     setViewerStartSlide(null);
   };
+
+  /**
+   * handleNodeClick - Handles click on a node
+   * Ctrl+click sets the node as the first slide of the presentation
+   * @param {Event} event - The click event
+   * @param {Object} node - The clicked node
+   */
+  const handleNodeClick = useCallback((event, node) => {
+    if (event.ctrlKey || event.metaKey) {
+      event.preventDefault();
+      // Toggle: if already first slide, unset it; otherwise set it
+      setFirstSlideId(prevId => prevId === node.id ? null : node.id);
+    }
+  }, []);
 
   /**
    * onConnect - Creates a new connection between two slides
@@ -818,18 +836,23 @@ function App() {
         <small className="control-hint">
           <strong>Double-clic</strong> = ouvrir l'éditeur<br/>
           <strong>Alt + clic</strong> = modifier le nom<br/>
+          <strong>Ctrl + clic</strong> = définir 1ère slide<br/>
           <strong>Suppr</strong> = supprimer la slide
         </small>
       </div>
 
       {/* React Flow component - The main diagram */}
       <ReactFlow
-        nodes={nodes}              // Slides to display
+        nodes={nodes.map(node => ({
+          ...node,
+          className: node.id === firstSlideId ? 'first-slide' : ''
+        }))}
         edges={edges}              // Connections to display
         onNodesChange={onNodesChange}  // Handle node changes
         onEdgesChange={onEdgesChange}  // Handle connection changes
         onConnect={onConnect}      // Create new connections
         onEdgeClick={handleEdgeClick}
+        onNodeClick={handleNodeClick}  // Handle Ctrl+click for first slide
         nodeTypes={nodeTypes}      // Custom node types
         fitView                    // Auto-zoom to fit all
       >
