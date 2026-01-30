@@ -44,6 +44,18 @@
   gap: 20px;
 }
 
+.project-title-input {
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+  color: white;
+  outline: none;
+}
+.project-title-input:focus { border-color: rgba(255,255,255,0.28); }
+
 .project-title {
   margin: 0;
   color: white;
@@ -172,6 +184,54 @@
   margin-top: 5px;
 }
 
+/* Edge context menu */
+.edge-menu {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: white;
+  color: #111;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+.edge-menu-btn {
+  background: #f8fafc;
+  border: 1px solid #e6eef8;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edge-menu-btn.icon {
+  width: 64px;
+  height: 64px;
+  flex-direction: column;
+  padding: 8px;
+}
+
+.edge-menu-btn.icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.edge-menu-label {
+  font-size: 11px;
+  margin-top: 6px;
+  color: #333;
+  text-align: center;
+}
+
+.edge-menu-btn:hover { background: #eef6ff; }
+.edge-menu-btn.danger { background: #fff5f5; border-color: #fee2e2; }
+.edge-menu-btn.danger svg { filter: none; }
+.edge-menu-btn.close { background: transparent; border: none; padding: 6px; font-size: 16px; }
+
 /* ============================================
    NŒUD PERSONNALISÉ POUR LES SLIDES
    Style pour chaque slide dans le diagramme
@@ -207,6 +267,9 @@
   border-color: #4CAF50;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
+
+/* Marquee selection rectangle for global flow view */
+/* removed global-selection-rect (was added for marquee) */
 
 /* ============================================
    CONTENU TEXTE DU NŒUD SLIDE

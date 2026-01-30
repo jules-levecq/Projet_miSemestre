@@ -9,6 +9,7 @@ function SlideViewer({ nodes, edges, startSlideId, onClose }) {
   const [currentSlideId, setCurrentSlideId] = useState(startSlideId || nodes[0]?.id);
   const [history, setHistory] = useState([]);
   const [showNavigation, setShowNavigation] = useState(true);
+  const [warning, setWarning] = useState('');
 
   // Récupérer la slide courante
   const currentSlide = nodes.find(n => n.id === currentSlideId);
@@ -44,6 +45,21 @@ function SlideViewer({ nodes, edges, startSlideId, onClose }) {
   const goBack = () => {
     if (history.length > 0) {
       const previousId = history[history.length - 1];
+
+      // Find the forward edge that brought us from previousId -> currentSlideId
+      const forwardEdge = edges.find(e => e.source === previousId && e.target === currentSlideId);
+      const reverseEdge = edges.find(e => e.source === currentSlideId && e.target === previousId);
+
+      // Allow back-navigation only if the forward edge explicitly allows reverse
+      // (represented by markerStart === 'arrow') or if a reverse edge exists
+      const allowBack = !!forwardEdge && (forwardEdge.markerStart === 'arrow' || !!reverseEdge);
+
+      if (!allowBack) {
+        setWarning('Retour bloqué : arête en sens unique');
+        setTimeout(() => setWarning(''), 1200);
+        return;
+      }
+
       setHistory(prev => prev.slice(0, -1));
       setCurrentSlideId(previousId);
     }
@@ -83,7 +99,7 @@ function SlideViewer({ nodes, edges, startSlideId, onClose }) {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [nextSlides, history, onClose]);
+  }, [nextSlides, history, onClose, edges]);
 
   if (!currentSlide) {
     return (
@@ -114,6 +130,9 @@ function SlideViewer({ nodes, edges, startSlideId, onClose }) {
             Historique: {history.length} | Suivantes: {nextSlides.length}
           </span>
         </div>
+        {warning && (
+          <div className="viewer-warning" style={{ color: '#ffcc00', marginLeft: 12 }}>{warning}</div>
+        )}
         <button 
           className="control-btn back-btn" 
           onClick={goBack} 

@@ -231,6 +231,8 @@ function App() {
   // Current project info (for saving)
   const [currentProjectId, setCurrentProjectId] = useState(null);
   const [currentProjectTitle, setCurrentProjectTitle] = useState('');
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const titleInputRef = useRef(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState(''); // 'saved', 'saving', 'error'
 
@@ -238,6 +240,8 @@ function App() {
   useEffect(() => {
     const storedProjectName = localStorage.getItem('currentProjectName');
     const storedProjectId = localStorage.getItem('loadProjectId');
+    const persistedProjectId = localStorage.getItem('currentProjectId');
+    const persistedProjectTitle = localStorage.getItem('currentProjectTitle');
     
     if (storedProjectName) {
       isNewProject.current = true;
@@ -246,8 +250,76 @@ function App() {
     } else if (storedProjectId) {
       loadProjectId.current = storedProjectId;
       localStorage.removeItem('loadProjectId');
+    } else if (persistedProjectId) {
+      // Restore last opened project on page reload
+      loadProjectId.current = persistedProjectId;
+      if (persistedProjectTitle) setCurrentProjectTitle(persistedProjectTitle);
     }
   }, []);
+
+  // Persist current project id/title so a page refresh can reload it
+  useEffect(() => {
+    if (currentProjectId) {
+      localStorage.setItem('currentProjectId', currentProjectId);
+    } else {
+      localStorage.removeItem('currentProjectId');
+    }
+  }, [currentProjectId]);
+
+  useEffect(() => {
+    if (currentProjectTitle) {
+      localStorage.setItem('currentProjectTitle', currentProjectTitle);
+    } else {
+      localStorage.removeItem('currentProjectTitle');
+    }
+  }, [currentProjectTitle]);
+
+  // focus title input when entering edit mode
+  useEffect(() => {
+    if (isEditingTitle && titleInputRef.current) {
+      titleInputRef.current.focus();
+      titleInputRef.current.select();
+    }
+  }, [isEditingTitle]);
+
+  // Save project title: update state, persist to server if project exists
+  const handleSaveProjectTitle = async (newTitle) => {
+    const trimmed = (newTitle || '').trim();
+    setCurrentProjectTitle(trimmed);
+    setIsEditingTitle(false);
+
+    if (currentProjectId) {
+      setIsSaving(true);
+      setSaveStatus('saving');
+      try {
+        const content = serializeProject(nodes, edges);
+        await updateProject(currentProjectId, trimmed, content);
+        setSaveStatus('saved');
+      } catch (err) {
+        console.error('Erreur sauvegarde titre:', err);
+        setSaveStatus('error');
+      } finally {
+        setIsSaving(false);
+      }
+    } else {
+      // no project id yet: keep title in state/localStorage
+      setSaveStatus('saved');
+    }
+  };
+
+  // Clipboard and history for global nodes/edges
+  const clipboardNodeRef = useRef(null);
+  const nodesHistoryRef = useRef([]);
+
+  const pushNodesHistory = () => {
+    try {
+      const snap = { nodes: JSON.parse(JSON.stringify(nodes)), edges: JSON.parse(JSON.stringify(edges)) };
+      nodesHistoryRef.current.push(snap);
+      if (nodesHistoryRef.current.length > 40) nodesHistoryRef.current.shift();
+    } catch (err) {
+      // ignore
+    }
+  };
 
   // State of nodes (slides)
   // - nodes: array of current slides
@@ -405,7 +477,9 @@ function App() {
    * handleBackToFlow - Returns to the flow view from the editor
    */
   const handleBackToFlow = () => {
+    // Clear current slide state then navigate to dashboard
     setCurrentSlide(null);
+    window.location.href = '/pages/home.html';
   };
 
   /**
@@ -440,9 +514,67 @@ function App() {
    * @param {Object} params - Contains source (starting slide ID) and target (destination slide ID)
    */
   const onConnect = useCallback(
-    (params) => setEdges((eds) => addEdge(params, eds)),
+    (params) => {
+      pushNodesHistory();
+      setEdges((eds) => {
+        // Prevent exact duplicate
+        const exists = eds.some(e => e.source === params.source && e.target === params.target);
+        if (exists) return eds;
+
+        // Remove reverse edge if present (enforce unique direction between two nodes)
+        const withoutReverse = eds.filter(e => !(e.source === params.target && e.target === params.source));
+        // Add the new directed edge (with arrow)
+        const newParams = { ...params, arrowHeadType: 'arrow', id: `e${params.source}-${params.target}` };
+        return addEdge(newParams, withoutReverse);
+      });
+    },
     [setEdges],
   );
+ 
+   // Edge menu state for context actions (unique/double/delete)
+  const [edgeMenu, setEdgeMenu] = useState({ open: false, x: 0, y: 0, edgeId: null, message: '' });
+ 
+  const handleEdgeClick = useCallback((event, edge) => {
+    event.preventDefault();
+    setEdgeMenu({ open: true, x: event.clientX, y: event.clientY, edgeId: edge.id, message: '' });
+  }, []);
+ 
+   const closeEdgeMenu = () => setEdgeMenu({ open: false, x: 0, y: 0, edgeId: null });
+ 
+  const setEdgeUnique = (edgeId) => {
+    setEdges((eds) => {
+      const targetEdge = eds.find(e => e.id === edgeId);
+      if (!targetEdge) return eds;
+      // remove reverse if exists
+      const withoutReverse = eds.filter(e => !(e.source === targetEdge.target && e.target === targetEdge.source));
+      // ensure the target edge has arrowHeadType
+      return withoutReverse.map(e => e.id === edgeId ? { ...e, arrowHeadType: 'arrow', markerStart: undefined } : e);
+    });
+    // feedback in menu then close
+    setEdgeMenu(prev => ({ ...prev, message: 'Sens unique appliqué' }));
+    setTimeout(() => closeEdgeMenu(), 900);
+  };
+ 
+  const setEdgeDouble = (edgeId) => {
+    setEdges((eds) => {
+      const targetEdge = eds.find(e => e.id === edgeId);
+      if (!targetEdge) return eds;
+      // remove any standalone reverse edge: we'll represent double-sense with a single edge
+      const withoutReverse = eds.filter(e => !(e.source === targetEdge.target && e.target === targetEdge.source));
+      // set both end markers on the target edge
+      const next = withoutReverse.map(e => e.id === edgeId ? { ...e, arrowHeadType: 'arrow', markerStart: 'arrow' } : e);
+      return next;
+    });
+    // feedback in menu then close
+    setEdgeMenu(prev => ({ ...prev, message: 'Double sens appliqué' }));
+    setTimeout(() => closeEdgeMenu(), 1200);
+  };
+ 
+  const deleteEdgeById = (edgeId) => {
+    setEdges((eds) => eds.filter(e => e.id !== edgeId));
+    setEdgeMenu(prev => ({ ...prev, message: 'Arête supprimée' }));
+    setTimeout(() => closeEdgeMenu(), 900);
+  };
 
   /**
    * addSlide - Adds a new slide to the list
@@ -461,7 +593,8 @@ function App() {
       data: { title: '', fontSize: 12 },                   // Empty title and default font size
     };
 
-    // Add the new slide to the existing list
+    // record history then add the new slide to the existing list
+    pushNodesHistory();
     setNodes((nds) => [...nds, newNode]);
 
     // Increment counter for the next slide
@@ -473,7 +606,8 @@ function App() {
    * @param {string} slideId - The ID of the slide to remove
    */
   const deleteSlide = useCallback((slideId) => {
-    // Remove the slide from nodes
+    // record history then remove the slide from nodes
+    pushNodesHistory();
     setNodes((nds) => nds.filter((node) => node.id !== slideId));
 
     // Remove all associated connections
@@ -516,6 +650,41 @@ function App() {
       if (event.key === 'Delete' && !isEditingText) {
         deleteSelectedSlide();
       }
+
+      // Global copy/paste/undo when not editing a slide
+      if ((event.ctrlKey || event.metaKey) && !isEditingText) {
+        const k = event.key.toLowerCase();
+        // Copy selected node
+        if (k === 'c') {
+          const sel = nodes.find(n => n.selected);
+          if (sel) {
+            clipboardNodeRef.current = JSON.parse(JSON.stringify(sel));
+          }
+        }
+        // Paste node (duplicate)
+        if (k === 'v') {
+          event.preventDefault();
+          if (clipboardNodeRef.current) {
+            pushNodesHistory();
+            const copied = JSON.parse(JSON.stringify(clipboardNodeRef.current));
+            const newId = slideCounter.toString();
+            copied.id = newId;
+            // offset position
+            copied.position = { x: (copied.position?.x || 250) + 30, y: (copied.position?.y || 100) + 30 };
+            setNodes((nds) => [...nds, copied]);
+            setSlideCounter((c) => c + 1);
+          }
+        }
+        // Undo
+        if (k === 'z') {
+          event.preventDefault();
+          const prev = nodesHistoryRef.current.pop();
+          if (prev) {
+            setNodes(prev.nodes);
+            setEdges(prev.edges);
+          }
+        }
+      }
     };
 
     // Add event listener
@@ -523,7 +692,7 @@ function App() {
 
     // Clean up listener when component is destroyed
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [deleteSelectedSlide]);
+  }, [deleteSelectedSlide, nodes, edges, slideCounter]);
 
   // ============================================
   // CONFIGURATION
@@ -598,7 +767,27 @@ function App() {
       {/* Header with project info and save status */}
       <div className="project-header">
         <div className="project-info">
-          <h2 className="project-title">{currentProjectTitle || 'Nouveau Projet'}</h2>
+          {isEditingTitle ? (
+            <input
+              ref={titleInputRef}
+              className="project-title-input"
+              value={currentProjectTitle}
+              onChange={(e) => setCurrentProjectTitle(e.target.value)}
+              onBlur={(e) => handleSaveProjectTitle(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleSaveProjectTitle(e.target.value);
+                }
+                if (e.key === 'Escape') {
+                  setIsEditingTitle(false);
+                }
+              }}
+              aria-label="Nom du projet"
+            />
+          ) : (
+            <h2 className="project-title" onClick={() => setIsEditingTitle(true)} title="Cliquer pour renommer">{currentProjectTitle || 'Nouveau Projet'}</h2>
+          )}
           <span className={`save-status ${saveStatus}`}>
             {saveStatus === 'saving' && '⏳ Sauvegarde...'}
             {saveStatus === 'saved' && '✅ Sauvegardé'}
@@ -640,12 +829,68 @@ function App() {
         onNodesChange={onNodesChange}  // Handle node changes
         onEdgesChange={onEdgesChange}  // Handle connection changes
         onConnect={onConnect}      // Create new connections
+        onEdgeClick={handleEdgeClick}
         nodeTypes={nodeTypes}      // Custom node types
         fitView                    // Auto-zoom to fit all
       >
         {/* Patterned background */}
         <Background variant="dots" gap={16} size={1} />
       </ReactFlow>
+      {/* Edge context menu */}
+      {edgeMenu.open && (
+        <div
+          className="edge-menu"
+          style={{ position: 'absolute', left: edgeMenu.x + 6, top: edgeMenu.y + 6, zIndex: 2000 }}
+        >
+          <button
+            className="edge-menu-btn icon"
+            onClick={() => setEdgeUnique(edgeMenu.edgeId)}
+            aria-label="Sens unique"
+            title="Sens unique"
+          >
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 12h12" stroke="#111" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M16 8l4 4-4 4" stroke="#111" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <div className="edge-menu-label">Sens unique</div>
+          </button>
+
+          <button
+            className="edge-menu-btn icon"
+            onClick={() => setEdgeDouble(edgeMenu.edgeId)}
+            aria-label="Double sens"
+            title="Double sens"
+          >
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 12h16" stroke="#111" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M8 8L4 12l4 4" stroke="#111" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M20 8l-4 4 4 4" stroke="#111" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <div className="edge-menu-label">Double sens</div>
+          </button>
+
+          <button
+            className="edge-menu-btn icon danger"
+            onClick={() => deleteEdgeById(edgeMenu.edgeId)}
+            aria-label="Supprimer arête"
+            title="Supprimer"
+          >
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 6h18" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M8 6v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M10 11v6M14 11v6" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M9 6V4h6v2" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <div className="edge-menu-label">Supprimer</div>
+          </button>
+
+          <button className="edge-menu-btn close" onClick={closeEdgeMenu} title="Fermer">✕</button>
+
+          {edgeMenu.message && (
+            <div className="edge-menu-message" style={{ marginTop: 6, fontSize: 12 }}>{edgeMenu.message}</div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
