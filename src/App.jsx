@@ -292,7 +292,7 @@ function App() {
       setIsSaving(true);
       setSaveStatus('saving');
       try {
-        const content = serializeProject(nodes, edges);
+        const content = serializeProject(nodes, edges, firstSlideId);
         await updateProject(currentProjectId, trimmed, content);
         setSaveStatus('saved');
       } catch (err) {
@@ -359,10 +359,11 @@ function App() {
       if (loadProjectId.current) {
         try {
           const project = await getProject(loadProjectId.current);
-          const { nodes: loadedNodes, edges: loadedEdges } = deserializeProject(project.content);
+          const { nodes: loadedNodes, edges: loadedEdges, firstSlideId: loadedFirstSlideId } = deserializeProject(project.content);
           
           setNodes(loadedNodes);
           setEdges(loadedEdges);
+          setFirstSlideId(loadedFirstSlideId);
           setCurrentProjectId(project.id);
           setCurrentProjectTitle(project.title);
           
@@ -415,7 +416,7 @@ function App() {
         // Save to DB if user is logged in
         if (user && user.id) {
           try {
-            const content = serializeProject(newNodes, []);
+            const content = serializeProject(newNodes, [], null);
             const project = await createProject(user.id, projectName.current, content);
             setCurrentProjectId(project.id);
             setSaveStatus('saved');
@@ -443,7 +444,7 @@ function App() {
         setSaveStatus('saving');
         
         try {
-          const content = serializeProject(nodes, edges);
+          const content = serializeProject(nodes, edges, firstSlideId);
           await updateProject(currentProjectId, currentProjectTitle, content);
           setSaveStatus('saved');
         } catch (error) {
@@ -458,7 +459,7 @@ function App() {
     // Debounce: save 1 second after last change
     const timeoutId = setTimeout(autoSave, 1000);
     return () => clearTimeout(timeoutId);
-  }, [nodes, edges, currentProjectId, currentProjectTitle]);
+  }, [nodes, edges, firstSlideId, currentProjectId, currentProjectTitle]);
 
   // ============================================
   // EFFECT - Listen for slide editor events

@@ -94,13 +94,17 @@ export async function deleteProject(projectId) {
 
 /**
  * Convertit les nodes/edges React Flow en JSON pour la DB
+ * @param {Array} nodes - Les nœuds (slides)
+ * @param {Array} edges - Les connexions
+ * @param {string|null} firstSlideId - L'ID de la première slide du diaporama
  */
-export function serializeProject(nodes, edges) {
-    return JSON.stringify({ nodes, edges });
+export function serializeProject(nodes, edges, firstSlideId = null) {
+    return JSON.stringify({ nodes, edges, firstSlideId });
 }
 
 /**
  * Parse le JSON de la DB en nodes/edges React Flow
+ * @returns {{nodes: Array, edges: Array, firstSlideId: string|null}}
  */
 export function deserializeProject(content) {
     try {
@@ -108,8 +112,9 @@ export function deserializeProject(content) {
         return {
             nodes: data.nodes || [],
             edges: data.edges || [],
+            firstSlideId: data.firstSlideId || null,
         };
     } catch {
-        return { nodes: [], edges: [] };
+        return { nodes: [], edges: [], firstSlideId: null };
     }
 }
