@@ -1,0 +1,246 @@
+{
+  "nodes": [
+    {
+      "id": "slide-1",
+      "type": "slideNode",
+      "position": { "x": 400, "y": 50 },
+      "data": {
+        "title": "🚀 Slidr",
+        "content": "L'application de présentations non-linéaires\n\nCréez des présentations interactives où votre audience choisit son parcours",
+        "style": {
+          "background": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+          "color": "#ffffff",
+          "fontFamily": "Montserrat, sans-serif"
+        }
+      }
+    },
+    {
+      "id": "slide-2",
+      "type": "slideNode",
+      "position": { "x": 100, "y": 250 },
+      "data": {
+        "title": "📝 Éditeur Intuitif",
+        "content": "• Double-clic pour créer une diapo\n• Glisser-déposer pour organiser\n• Connexions visuelles entre les diapositives\n• Interface React Flow moderne",
+        "style": {
+          "background": "linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%)",
+          "color": "#2d3748",
+          "fontFamily": "Inter, sans-serif"
+        }
+      }
+    },
+    {
+      "id": "slide-3",
+      "type": "slideNode",
+      "position": { "x": 700, "y": 250 },
+      "data": {
+        "title": "🎨 25 Templates",
+        "content": "5 styles cohérents :\n\n🤍 Minimaliste\n💼 Corporate\n🎨 Créatif\n🌙 Sombre\n🌿 Nature",
+        "style": {
+          "background": "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)",
+          "color": "#4a1942",
+          "fontFamily": "Poppins, sans-serif"
+        }
+      }
+    },
+    {
+      "id": "slide-4",
+      "type": "slideNode",
+      "position": { "x": 400, "y": 450 },
+      "data": {
+        "title": "🔀 Navigation Non-Linéaire",
+        "content": "Contrairement aux présentations classiques :\n\n→ Plusieurs chemins possibles\n→ L'audience choisit son parcours\n→ Retour en arrière intelligent\n→ Connexions bidirectionnelles",
+        "style": {
+          "background": "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)",
+          "color": "#e8e8e8",
+          "fontFamily": "JetBrains Mono, monospace"
+        }
+      }
+    },
+    {
+      "id": "slide-5",
+      "type": "slideNode",
+      "position": { "x": 100, "y": 650 },
+      "data": {
+        "title": "🖥️ Mode Présentation",
+        "content": "• Plein écran immersif\n• Mise à l'échelle automatique\n• Boutons de navigation élégants\n• Historique de navigation",
+        "style": {
+          "background": "linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 100%)",
+          "color": "#ffffff",
+          "fontFamily": "SF Pro Display, sans-serif"
+        }
+      }
+    },
+    {
+      "id": "slide-6",
+      "type": "slideNode",
+      "position": { "x": 700, "y": 650 },
+      "data": {
+        "title": "⭐ Diapo de Départ",
+        "content": "Ctrl + Clic sur une diapo pour la définir comme point de départ\n\n• Bordure orange distinctive\n• Badge \"Départ\" visible\n• Sauvegardée avec le projet",
+        "style": {
+          "background": "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+          "color": "#ffffff",
+          "fontFamily": "Montserrat, sans-serif"
+        }
+      }
+    },
+    {
+      "id": "slide-7",
+      "type": "slideNode",
+      "position": { "x": 400, "y": 850 },
+      "data": {
+        "title": "💾 Sauvegarde & Chargement",
+        "content": "• Export en fichier JSON\n• Import de projets existants\n• Préserve toutes les connexions\n• Compatible avec le backend Spring Boot",
+        "style": {
+          "background": "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
+          "color": "#2d3748",
+          "fontFamily": "Inter, sans-serif"
+        }
+      }
+    },
+    {
+      "id": "slide-8",
+      "type": "slideNode",
+      "position": { "x": 100, "y": 1050 },
+      "data": {
+        "title": "🛠️ Technologies",
+        "content": "Frontend :\n• React + Vite\n• React Flow\n• CSS moderne\n\nBackend :\n• Spring Boot\n• JPA/Hibernate",
+        "style": {
+          "background": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+          "color": "#ffffff",
+          "fontFamily": "JetBrains Mono, monospace"
+        }
+      }
+    },
+    {
+      "id": "slide-9",
+      "type": "slideNode",
+      "position": { "x": 700, "y": 1050 },
+      "data": {
+        "title": "✨ Fonctionnalités Clés",
+        "content": "✓ Création rapide de diapositives\n✓ 25 templates professionnels\n✓ Navigation multi-chemins\n✓ Mode plein écran\n✓ Retour arrière intelligent\n✓ Persistance des projets",
+        "style": {
+          "background": "linear-gradient(135deg, #11998e 0%, #38ef7d 100%)",
+          "color": "#ffffff",
+          "fontFamily": "Poppins, sans-serif"
+        }
+      }
+    },
+    {
+      "id": "slide-10",
+      "type": "slideNode",
+      "position": { "x": 400, "y": 1250 },
+      "data": {
+        "title": "🎯 Merci !",
+        "content": "Slidr - Présentations Non-Linéaires\n\nProjet de mi-semestre\n\n🚀 Prêt à révolutionner vos présentations ?",
+        "style": {
+          "background": "linear-gradient(135deg, #ff6b6b 0%, #feca57 100%)",
+          "color": "#ffffff",
+          "fontFamily": "Montserrat, sans-serif"
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1-2",
+      "source": "slide-1",
+      "target": "slide-2",
+      "type": "smoothstep",
+      "animated": true,
+      "label": "Éditeur"
+    },
+    {
+      "id": "e1-3",
+      "source": "slide-1",
+      "target": "slide-3",
+      "type": "smoothstep",
+      "animated": true,
+      "label": "Templates"
+    },
+    {
+      "id": "e2-4",
+      "source": "slide-2",
+      "target": "slide-4",
+      "type": "smoothstep",
+      "animated": true
+    },
+    {
+      "id": "e3-4",
+      "source": "slide-3",
+      "target": "slide-4",
+      "type": "smoothstep",
+      "animated": true
+    },
+    {
+      "id": "e4-5",
+      "source": "slide-4",
+      "target": "slide-5",
+      "type": "smoothstep",
+      "animated": true,
+      "label": "Présentation"
+    },
+    {
+      "id": "e4-6",
+      "source": "slide-4",
+      "target": "slide-6",
+      "type": "smoothstep",
+      "animated": true,
+      "label": "Départ"
+    },
+    {
+      "id": "e5-7",
+      "source": "slide-5",
+      "target": "slide-7",
+      "type": "smoothstep",
+      "animated": true
+    },
+    {
+      "id": "e6-7",
+      "source": "slide-6",
+      "target": "slide-7",
+      "type": "smoothstep",
+      "animated": true
+    },
+    {
+      "id": "e7-8",
+      "source": "slide-7",
+      "target": "slide-8",
+      "type": "smoothstep",
+      "animated": true,
+      "label": "Tech"
+    },
+    {
+      "id": "e7-9",
+      "source": "slide-7",
+      "target": "slide-9",
+      "type": "smoothstep",
+      "animated": true,
+      "label": "Features"
+    },
+    {
+      "id": "e8-10",
+      "source": "slide-8",
+      "target": "slide-10",
+      "type": "smoothstep",
+      "animated": true
+    },
+    {
+      "id": "e9-10",
+      "source": "slide-9",
+      "target": "slide-10",
+      "type": "smoothstep",
+      "animated": true
+    },
+    {
+      "id": "e4-7",
+      "source": "slide-4",
+      "target": "slide-7",
+      "type": "smoothstep",
+      "animated": true,
+      "style": { "strokeDasharray": "5,5" },
+      "label": "Raccourci"
+    }
+  ],
+  "firstSlideId": "slide-1"
+}
