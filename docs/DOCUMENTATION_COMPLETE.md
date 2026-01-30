@@ -1,11 +1,11 @@
-# 📚 Documentation Technique Complète - Slid'R
+#  Documentation Technique Complète - Slid'R
 
 > **Slid'R** - Éditeur de Diapositives Non Linéaires  
 > Version 0.0.1-SNAPSHOT | ISEN 2026
 
 ---
 
-## 📋 Table des matières
+## Table des matières
 
 1. [Présentation du Projet](#1-présentation-du-projet)
 2. [Architecture Générale](#2-architecture-générale)
@@ -25,104 +25,33 @@
 
 ## 1. Présentation du Projet
 
-### 🎯 Objectif
+### Objectif
 
 Créer un site web pour **créer, éditer et visionner des diapositives non linéaires**, où les slides sont reliées de manière flexible (pas seulement en séquence). L'éditeur offre une interface style Canva/Figma pour personnaliser chaque slide.
 
-### 💡 Concept Innovant
-
-Contrairement à PowerPoint ou Google Slides où les diapositives s'enchaînent linéairement (1 → 2 → 3), Slid'R permet de créer des **présentations arborescentes** :
-
-```
-                    ┌─────────────┐
-                    │ Introduction│
-                    └──────┬──────┘
-                           │
-              ┌────────────┼────────────┐
-              ▼            │            ▼
-       ┌──────────┐        │     ┌──────────┐
-       │ Option A │        │     │ Option B │
-       └────┬─────┘        │     └────┬─────┘
-            │              │          │
-            └──────────────┼──────────┘
-                           ▼
-                    ┌─────────────┐
-                    │  Conclusion │
-                    └─────────────┘
-```
-
-### 🎓 Cas d'Usage
-
-- **Présentations interactives** : L'orateur choisit le chemin selon les questions
-- **Tutoriels adaptatifs** : Parcours différents selon le niveau de l'utilisateur
-- **Jeux narratifs** : Histoires à embranchements multiples
-- **Formations** : Modules optionnels selon les besoins
-
----
 
 ## 2. Architecture Générale
 
 ### Vue d'ensemble
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                           CLIENT (Navigateur)                        │
-│                                                                      │
-│  ┌────────────────────────────┐  ┌────────────────────────────────┐ │
-│  │     Pages Statiques        │  │     Application React          │ │
-│  │  (HTML/CSS/JS vanilla)     │  │   (Éditeur de diapositives)    │ │
-│  │                            │  │                                │ │
-│  │  • home.html (Accueil)     │  │  • App.jsx (Graphe de slides)  │ │
-│  │  • connexion.html          │  │  • SlideEditor.jsx (Éditeur)   │ │
-│  │  • inscription.html        │  │  • SlideViewer.jsx (Lecture)   │ │
-│  │  • dashboard.html          │  │  • React Flow (Diagrammes)     │ │
-│  └─────────────┬──────────────┘  └────────────────┬───────────────┘ │
-│                │                                   │                 │
-│                └───────────────┬───────────────────┘                 │
-│                                │ HTTP/REST                           │
-└────────────────────────────────┼─────────────────────────────────────┘
-                                 │
-                                 ▼ Port 8080
-┌─────────────────────────────────────────────────────────────────────┐
-│                        SERVEUR (Spring Boot)                         │
-│                                                                      │
-│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────────┐  │
-│  │  AuthController │  │ ProjectController│  │    Repositories    │  │
-│  │  /api/auth/*    │  │  /api/projects/* │  │  (Accès données)   │  │
-│  └────────┬────────┘  └────────┬────────┘  └──────────┬──────────┘  │
-│           │                    │                       │             │
-│           └────────────────────┼───────────────────────┘             │
-│                                │ JPA/Hibernate                       │
-└────────────────────────────────┼─────────────────────────────────────┘
-                                 │
-                                 ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                      BASE DE DONNÉES H2                              │
-│                  Fichier: ./data/slidedb.mv.db                       │
-│                                                                      │
-│  ┌─────────────────┐              ┌─────────────────┐               │
-│  │     USERS       │    1:N       │    PROJECTS     │               │
-│  │  (utilisateurs) │◄────────────│   (diaporamas)   │               │
-│  └─────────────────┘              └─────────────────┘               │
-└─────────────────────────────────────────────────────────────────────┘
-```
+
 
 ### Structure des Dossiers
 
 ```
 Projet_miSemestre/
-├── 📄 package.json              # Dépendances npm (frontend)
-├── 📄 vite.config.js            # Configuration Vite
-├── 📄 index.html                # Point d'entrée principal
-├── 📄 app.html                  # Point d'entrée éditeur React
+├── package.json              # Dépendances npm (frontend)
+├── vite.config.js            # Configuration Vite
+├── index.html                # Point d'entrée principal
+├── app.html                  # Point d'entrée éditeur React
 │
-├── 📁 pages/                    # Pages HTML statiques
+├── pages/                    # Pages HTML statiques
 │   ├── home.html                # Page d'accueil
 │   ├── connexion.html           # Formulaire de connexion
 │   ├── inscription.html         # Formulaire d'inscription
 │   └── dashboard.html           # Tableau de bord projets
 │
-├── 📁 assets/                   # Ressources statiques
+├── assets/                   # Ressources statiques
 │   ├── css/
 │   │   ├── home.css             # Styles accueil + dashboard
 │   │   └── auth.css             # Styles authentification
@@ -131,7 +60,7 @@ Projet_miSemestre/
 │       ├── dashboard.js         # Logique tableau de bord
 │       └── auth.js              # Logique connexion/inscription
 │
-├── 📁 src/                      # Code source React
+├── src/                      # Code source React
 │   ├── main.jsx                 # Point d'entrée React
 │   ├── App.jsx                  # Composant principal (graphe)
 │   ├── App.css                  # Styles de l'éditeur
@@ -146,7 +75,7 @@ Projet_miSemestre/
 │   └── services/
 │       └── api.js               # Communication avec le backend
 │
-├── 📁 backend/                  # Serveur Spring Boot
+├── backend/                  # Serveur Spring Boot
 │   ├── pom.xml                  # Configuration Maven
 │   ├── data/                    # Fichiers base de données H2
 │   └── src/main/java/com/slidr/
@@ -161,7 +90,7 @@ Projet_miSemestre/
 │           ├── UserRepository.java    # Accès données users
 │           └── ProjectRepository.java # Accès données projets
 │
-└── 📁 docs/                     # Documentation
+└── docs/                     # Documentation
     └── MAVEN_ET_DATABASE.md     # Guide Maven et BDD
 ```
 
@@ -228,13 +157,13 @@ npm install
 cd backend
 mvn spring-boot:run
 ```
-> 🟢 Le serveur démarre sur **http://localhost:8080**
+> Le serveur démarre sur **http://localhost:8080**
 
 #### Terminal 2 - Frontend Vite
 ```bash
 npm run dev
 ```
-> 🟢 L'application s'ouvre sur **http://localhost:5173**
+> L'application s'ouvre sur **http://localhost:5173**
 
 ### URLs Importantes
 
@@ -362,7 +291,6 @@ function SlideNode({ data, id }) {
 | **Texte** | Ajout, édition, polices, couleurs, alignement |
 | **Formes** | Rectangle, cercle, triangle, ligne, flèche |
 | **Images** | Import et redimensionnement |
-| **Arrière-plan** | Couleur unie ou dégradé |
 | **Drag & Drop** | Déplacement et redimensionnement des éléments |
 
 ```jsx
@@ -701,6 +629,7 @@ CREATE TABLE projects (
 );
 ```
 
+
 ### Accès à la Console H2
 
 1. Démarrer le backend
@@ -717,27 +646,18 @@ CREATE TABLE projects (
 ### Flux de Connexion
 
 ```
-┌─────────────┐                           ┌─────────────────┐
-│  Formulaire │  POST /api/auth/login     │  AuthController │
-│  Connexion  │ ─────────────────────────►│                 │
-│             │   {email, password}       │                 │
-└─────────────┘                           └────────┬────────┘
+
+ Formulaire   POST /api/auth/login       
+ Connexion   ─────────────────────────►       AuthController      
+                {email, password}
                                                    │
                                                    ▼
-                                          ┌─────────────────┐
-                                          │ UserRepository  │
-                                          │ findByEmail()   │
-                                          └────────┬────────┘
-                                                   │
-      ◄────────────────────────────────────────────┘
-      │ Réponse JSON :
-      │ {userId, firstName, lastName, email}
-      ▼
-┌─────────────┐
-│ localStorage│
-│ ou session  │
-│  Storage    │
-└─────────────┘
+localStorage                                 UserRepository  
+ou session   ◄────────────────────────────   findByEmail()   
+Storage            Réponse JSON :
+              {userId, firstName, lastName, email}
+                                                
+                                                
 ```
 
 ### Stockage Côté Client
@@ -860,65 +780,30 @@ function getCurrentUser() {
 ---
 
 ## 11. Diagrammes
-
-### Diagramme de Séquence - Création de Projet
-
-```
-┌─────────┐       ┌─────────┐       ┌─────────────────┐       ┌────────┐
-│  User   │       │ Frontend│       │ ProjectController│       │   DB   │
-└────┬────┘       └────┬────┘       └────────┬────────┘       └────┬───┘
-     │                 │                      │                     │
-     │  Clic "Nouveau" │                      │                     │
-     │────────────────>│                      │                     │
-     │                 │                      │                     │
-     │                 │  POST /api/projects  │                     │
-     │                 │  {userId, title}     │                     │
-     │                 │─────────────────────>│                     │
-     │                 │                      │                     │
-     │                 │                      │  findById(userId)   │
-     │                 │                      │────────────────────>│
-     │                 │                      │                     │
-     │                 │                      │     User found      │
-     │                 │                      │<────────────────────│
-     │                 │                      │                     │
-     │                 │                      │  save(project)      │
-     │                 │                      │────────────────────>│
-     │                 │                      │                     │
-     │                 │                      │   Saved project     │
-     │                 │                      │<────────────────────│
-     │                 │                      │                     │
-     │                 │   {id, title, ...}   │                     │
-     │                 │<─────────────────────│                     │
-     │                 │                      │                     │
-     │  Redirection    │                      │                     │
-     │  vers éditeur   │                      │                     │
-     │<────────────────│                      │                     │
-```
-
 ### Modèle de Données
 
 ```
 ┌─────────────────────────────────┐
 │            USER                 │
 ├─────────────────────────────────┤
-│ + id : Long (PK)                │
-│ + firstName : String            │
-│ + lastName : String             │
-│ + email : String (UNIQUE)       │
-│ + password : String             │
+│   id : Long (PK)                │
+│   firstName : String            │
+│   lastName : String             │
+│   email : String (UNIQUE)       │
+│   password : String             │
 └───────────────┬─────────────────┘
                 │ 1
                 │
-                │ owns
+                │
                 │
                 │ *
 ┌───────────────┴─────────────────┐
 │           PROJECT               │
 ├─────────────────────────────────┤
-│ + id : Long (PK)                │
-│ + title : String                │
-│ + content : String (JSON)       │
-│ + user_id : Long (FK)           │
+│   id : Long (PK)                │
+│   title : String                │
+│   content : String (JSON)       │
+│   user_id : Long (FK)           │
 └─────────────────────────────────┘
 ```
 
