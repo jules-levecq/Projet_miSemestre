@@ -830,8 +830,8 @@ body {
     border-radius: 12px;
     box-shadow: 0 20px 40px rgba(0,0,0,0.5);
     z-index: 1000;
-    width: 320px;
-    max-height: 420px;
+    width: 340px;
+    max-height: 450px;
     overflow: hidden;
     animation: emojiPickerIn 0.2s ease;
     backdrop-filter: blur(20px);
@@ -879,69 +879,50 @@ body {
     color: var(--text-main);
 }
 
-.emoji-input-section {
-    padding: 12px 16px;
+.emoji-tabs {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    gap: 4px;
+    padding: 8px 12px;
+    overflow-x: auto;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    background: rgba(15, 23, 42, 0.3);
 }
 
-.emoji-input {
-    width: 100%;
-    padding: 12px 16px;
-    font-size: 1.5rem;
-    text-align: center;
-    background: rgba(15, 23, 42, 0.6);
-    border: 2px solid rgba(59, 130, 246, 0.3);
-    border-radius: 10px;
-    color: var(--text-main);
-    outline: none;
+.emoji-tabs::-webkit-scrollbar {
+    height: 4px;
+}
+
+.emoji-tabs::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+}
+
+.emoji-tab {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    padding: 6px 8px;
+    border-radius: 8px;
+    cursor: pointer;
     transition: 0.2s;
+    flex-shrink: 0;
 }
 
-.emoji-input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
-}
-
-.emoji-input::placeholder {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-}
-
-.emoji-hint {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    text-align: center;
-}
-
-.emoji-picker-divider {
-    display: flex;
-    align-items: center;
-    padding: 0 16px;
-    margin: 4px 0;
-}
-
-.emoji-picker-divider::before,
-.emoji-picker-divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
+.emoji-tab:hover {
     background: rgba(255,255,255,0.1);
 }
 
-.emoji-picker-divider span {
-    padding: 0 12px;
-    font-size: 0.75rem;
-    color: var(--text-muted);
+.emoji-tab.active {
+    background: var(--accent);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
 }
 
 .emoji-picker-grid {
     display: grid;
     grid-template-columns: repeat(8, 1fr);
-    gap: 4px;
-    padding: 12px;
-    max-height: 280px;
+    gap: 2px;
+    padding: 10px;
+    max-height: 320px;
     overflow-y: auto;
 }
 
