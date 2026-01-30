@@ -1,5 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import './SlideViewer.css';
+
+// Dimensions de référence de l'éditeur (pour le calcul du scale)
+const EDITOR_WIDTH = 800;
+const EDITOR_HEIGHT = 500;
 
 /**
  * SlideViewer - Mode présentation avec navigation non-linéaire
@@ -10,6 +14,8 @@ function SlideViewer({ nodes, edges, startSlideId, onClose }) {
   const [history, setHistory] = useState([]);
   const [showNavigation, setShowNavigation] = useState(true);
   const [warning, setWarning] = useState('');
+  const [scale, setScale] = useState(1);
+  const slideContainerRef = useRef(null);
 
   // Récupérer la slide courante
   const currentSlide = nodes.find(n => n.id === currentSlideId);
@@ -34,6 +40,28 @@ function SlideViewer({ nodes, edges, startSlideId, onClose }) {
 
   const nextSlides = getNextSlides();
   const previousSlides = getPreviousSlides();
+
+  // Calculer le scale pour adapter la slide à l'écran
+  useEffect(() => {
+    const calculateScale = () => {
+      if (slideContainerRef.current) {
+        const container = slideContainerRef.current;
+        const containerWidth = container.clientWidth;
+        const containerHeight = container.clientHeight;
+        
+        // Calculer le scale pour que la slide entre dans le conteneur
+        const scaleX = containerWidth / EDITOR_WIDTH;
+        const scaleY = containerHeight / EDITOR_HEIGHT;
+        const newScale = Math.min(scaleX, scaleY, 1.5); // Max scale 1.5
+        
+        setScale(newScale);
+      }
+    };
+
+    calculateScale();
+    window.addEventListener('resize', calculateScale);
+    return () => window.removeEventListener('resize', calculateScale);
+  }, []);
 
   // Naviguer vers une slide
   const navigateTo = (slideId) => {
@@ -144,48 +172,61 @@ function SlideViewer({ nodes, edges, startSlideId, onClose }) {
       </div>
 
       {/* Zone de la slide */}
-      <div className="viewer-slide" style={bgStyle}>
-        {/* Rendu des éléments de la slide */}
-        {slideData.elements?.map(element => (
-          <div
-            key={element.id}
-            className={`viewer-element viewer-${element.type}`}
-            style={{
-              position: 'absolute',
-              left: element.x,
-              top: element.y,
-              width: element.width,
-              height: element.height,
-              fontSize: element.fontSize,
-              fontWeight: element.fontWeight,
-              fontFamily: element.fontFamily,
-              color: element.color,
-              backgroundColor: element.backgroundColor,
-              borderRadius: element.borderRadius,
-              textAlign: element.align,
-              display: 'flex',
-              alignItems: element.type === 'text' ? 'flex-start' : 'center',
-              justifyContent: element.align === 'center' ? 'center' : 'flex-start',
-            }}
-          >
-            {element.type === 'text' && element.content}
-            {element.type === 'image' && (
-              <img 
-                src={element.src} 
-                alt="" 
-                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: element.borderRadius }} 
-              />
-            )}
-          </div>
-        ))}
+      <div className="viewer-slide-container" ref={slideContainerRef}>
+        <div 
+          className="viewer-slide" 
+          style={{
+            ...bgStyle,
+            width: EDITOR_WIDTH,
+            height: EDITOR_HEIGHT,
+            transform: `scale(${scale})`,
+            transformOrigin: 'center center',
+          }}
+        >
+          {/* Rendu des éléments de la slide */}
+          {slideData.elements?.map(element => (
+            <div
+              key={element.id}
+              className={`viewer-element viewer-${element.type}`}
+              style={{
+                position: 'absolute',
+                left: element.x,
+                top: element.y,
+                width: element.width,
+                height: element.height,
+                fontSize: element.fontSize,
+                fontWeight: element.fontWeight,
+                fontFamily: element.fontFamily,
+                color: element.color,
+                backgroundColor: element.type !== 'text' ? element.backgroundColor : 'transparent',
+                borderRadius: element.borderRadius,
+                textAlign: element.align,
+                display: 'flex',
+                alignItems: element.type === 'text' ? 'flex-start' : 'center',
+                justifyContent: element.align === 'center' ? 'center' : 
+                               element.align === 'right' ? 'flex-end' : 'flex-start',
+                lineHeight: 1.4,
+              }}
+            >
+              {element.type === 'text' && element.content}
+              {element.type === 'image' && (
+                <img 
+                  src={element.src} 
+                  alt="" 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: element.borderRadius }} 
+                />
+              )}
+            </div>
+          ))}
 
-        {/* Message si slide vide */}
-        {(!slideData.elements || slideData.elements.length === 0) && (
-          <div className="empty-slide-message">
-            <h2>{slideData.label || 'Slide sans contenu'}</h2>
-            <p>Cette slide est vide. Double-cliquez dessus dans l'éditeur pour ajouter du contenu.</p>
-          </div>
-        )}
+          {/* Message si slide vide */}
+          {(!slideData.elements || slideData.elements.length === 0) && (
+            <div className="empty-slide-message">
+              <h2>{slideData.label || slideData.title || 'Slide sans contenu'}</h2>
+              <p>Cette slide est vide. Double-cliquez dessus dans l'éditeur pour ajouter du contenu.</p>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Navigation vers les slides suivantes */}
