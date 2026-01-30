@@ -477,9 +477,9 @@ function App() {
    * handleBackToFlow - Returns to the flow view from the editor
    */
   const handleBackToFlow = () => {
-    // Clear current slide state then navigate to dashboard
+    // Clear current slide state to return to the in-app flow view
+    // (do NOT navigate away to dashboard from the editor)
     setCurrentSlide(null);
-    window.location.href = '/pages/home.html';
   };
 
   /**
@@ -796,7 +796,7 @@ function App() {
           </span>
         </div>
         <button 
-          onClick={() => window.location.href = '/pages/home.html'} 
+          onClick={() => window.location.href = '/pages/dashboard.html'} 
           className="button-common button-back"
         >
           ← Retour
