@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 name: p.title,
                 dateCreate: new Date().toISOString().split('T')[0], // TODO: ajouter createdAt dans le backend
                 lastModified: new Date().toISOString().split('T')[0], // TODO: ajouter updatedAt dans le backend
-                preview: getProjectPreview(p.content),
+                emoji: getStoredEmoji(p.id) || getProjectPreview(p.content),
                 isFavorite: false // TODO: ajouter isFavorite dans le backend
             }));
             
@@ -147,6 +147,31 @@ document.addEventListener('DOMContentLoaded', () => {
             return '📄';
         }
     }
+    
+    // Récupère l'emoji stocké pour un projet
+    function getStoredEmoji(projectId) {
+        const emojis = JSON.parse(localStorage.getItem('projectEmojis') || '{}');
+        return emojis[projectId] || null;
+    }
+    
+    // Stocke l'emoji pour un projet
+    function storeEmoji(projectId, emoji) {
+        const emojis = JSON.parse(localStorage.getItem('projectEmojis') || '{}');
+        emojis[projectId] = emoji;
+        localStorage.setItem('projectEmojis', JSON.stringify(emojis));
+    }
+    
+    // Liste d'emojis disponibles pour les projets
+    const AVAILABLE_EMOJIS = [
+        '📄', '📊', '📑', '📚', '📁', '📂', '🗂️', '📋', '📝', '✏️',
+        '🎨', '🎬', '🎤', '🎯', '🚀', '💡', '⭐', '🌟', '✨', '💫',
+        '🔥', '💎', '🏆', '🎖️', '🏅', '🎁', '🎉', '🎊', '🎈', '🎀',
+        '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '💖', '💝',
+        '🌈', '☀️', '🌙', '⚡', '🌊', '🍀', '🌸', '🌺', '🌻', '🌹',
+        '🐱', '🐶', '🦊', '🦁', '🐼', '🐨', '🦄', '🐝', '🦋', '🐬',
+        '📱', '💻', '🖥️', '⌨️', '🖱️', '🔧', '⚙️', '🔬', '🔭', '📡',
+        '🏠', '🏢', '🏫', '🏥', '🏦', '🏛️', '⛪', '🕌', '🗼', '🗽'
+    ];
 
     // ==========================================
     // 4. RENDU DES PROJETS
@@ -183,9 +208,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const starClass = project.isFavorite ? 'active' : '';
 
             card.innerHTML = `
-                <div class="card-preview" onclick="openProject(${project.id})">
-                    ${project.preview}
+                <div class="card-preview">
+                    <span class="project-emoji" onclick="openEmojiPicker(event, ${project.id})" title="Cliquer pour changer l'emoji">${project.emoji}</span>
                     <span class="star-btn ${starClass}" onclick="toggleFavorite(event, ${project.id})">★</span>
+                    <div class="preview-overlay" onclick="openProject(${project.id})"></div>
                 </div>
                 <div class="card-infos">
                     <h3 onclick="openProject(${project.id})" style="cursor:pointer">${project.name}</h3>
@@ -244,6 +270,70 @@ document.addEventListener('DOMContentLoaded', () => {
             project.isFavorite = !project.isFavorite;
             applyFiltersAndSort();
         }
+    };
+    
+    // Ouvre le picker d'emojis
+    window.openEmojiPicker = function(event, projectId) {
+        event.stopPropagation();
+        
+        // Supprimer un picker existant
+        const existingPicker = document.querySelector('.emoji-picker');
+        if (existingPicker) existingPicker.remove();
+        
+        // Créer le picker
+        const picker = document.createElement('div');
+        picker.className = 'emoji-picker';
+        picker.innerHTML = `
+            <div class="emoji-picker-header">
+                <span>Choisir un emoji</span>
+                <button class="emoji-picker-close" onclick="closeEmojiPicker()">✕</button>
+            </div>
+            <div class="emoji-picker-grid">
+                ${AVAILABLE_EMOJIS.map(e => `<span class="emoji-option" onclick="selectEmoji(event, ${projectId}, '${e}')">${e}</span>`).join('')}
+            </div>
+        `;
+        
+        // Positionner le picker près du clic
+        const rect = event.target.getBoundingClientRect();
+        picker.style.position = 'fixed';
+        picker.style.top = `${Math.min(rect.bottom + 10, window.innerHeight - 350)}px`;
+        picker.style.left = `${Math.min(rect.left, window.innerWidth - 320)}px`;
+        
+        document.body.appendChild(picker);
+        
+        // Fermer en cliquant ailleurs
+        setTimeout(() => {
+            document.addEventListener('click', closeEmojiPickerOnClickOutside);
+        }, 10);
+    };
+    
+    function closeEmojiPickerOnClickOutside(e) {
+        const picker = document.querySelector('.emoji-picker');
+        if (picker && !picker.contains(e.target)) {
+            closeEmojiPicker();
+        }
+    }
+    
+    window.closeEmojiPicker = function() {
+        const picker = document.querySelector('.emoji-picker');
+        if (picker) picker.remove();
+        document.removeEventListener('click', closeEmojiPickerOnClickOutside);
+    };
+    
+    window.selectEmoji = function(event, projectId, emoji) {
+        event.stopPropagation();
+        
+        // Stocker l'emoji
+        storeEmoji(projectId, emoji);
+        
+        // Mettre à jour les données
+        const project = projectsData.find(p => p.id === projectId);
+        if (project) {
+            project.emoji = emoji;
+            applyFiltersAndSort();
+        }
+        
+        closeEmojiPicker();
     };
 
     window.openProject = function(id) {
