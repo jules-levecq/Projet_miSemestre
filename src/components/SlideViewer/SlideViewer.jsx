@@ -41,6 +41,32 @@ function SlideViewer({ nodes, edges, startSlideId, onClose }) {
   const nextSlides = getNextSlides();
   const previousSlides = getPreviousSlides();
 
+  // Activer le mode plein écran lors du montage
+  useEffect(() => {
+    const enterFullscreen = async () => {
+      try {
+        if (document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen();
+        } else if (document.documentElement.webkitRequestFullscreen) {
+          await document.documentElement.webkitRequestFullscreen();
+        } else if (document.documentElement.msRequestFullscreen) {
+          await document.documentElement.msRequestFullscreen();
+        }
+      } catch (err) {
+        console.log('Impossible d\'activer le plein écran:', err);
+      }
+    };
+
+    enterFullscreen();
+
+    // Quitter le plein écran lors du démontage
+    return () => {
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      }
+    };
+  }, []);
+
   // Calculer le scale pour adapter la slide à l'écran
   useEffect(() => {
     const calculateScale = () => {
@@ -161,14 +187,15 @@ function SlideViewer({ nodes, edges, startSlideId, onClose }) {
         {warning && (
           <div className="viewer-warning" style={{ color: '#ffcc00', marginLeft: 12 }}>{warning}</div>
         )}
-        <button 
-          className="control-btn back-btn" 
-          onClick={goBack} 
-          disabled={history.length === 0}
-          title="Retour (← ou Backspace)"
-        >
-          ← Retour
-        </button>
+        {history.length > 0 && (
+          <button 
+            className="control-btn back-btn" 
+            onClick={goBack}
+            title="Retour (← ou Backspace)"
+          >
+            ← Retour
+          </button>
+        )}
       </div>
 
       {/* Zone de la slide */}
