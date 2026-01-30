@@ -147,7 +147,7 @@
 
 /* ===== SIDEBAR GAUCHE ===== */
 .sidebar-left {
-  width: 72px;
+  width: 150px;
   background: #2d2d2d;
   border-right: 1px solid #404040;
   display: flex;
@@ -778,3 +778,4 @@
     height: 100%;
     box-sizing: border-box; /* Important pour que le padding ne casse pas la taille */
 }
+
